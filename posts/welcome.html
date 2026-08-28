@@ -8,14 +8,17 @@
     <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
-    <header>
-        <h2>Welcome to My Blog</h2>
+    <div class="progress-bar" aria-hidden="true"></div>
+    <header class="site-header">
+        <p class="tagline">Welcome to My Blog</p>
     </header>
 
-    <nav>
+    <nav class="site-nav" aria-label="Main">
         <ul>
             <li><a href="../blog.html">Back to Blog</a></li>
             <li><a href="../index.html">Home</a></li>
+        </ul>
+            <li class="theme-item"><button id="theme-toggle" type="button" aria-label="Theme: auto (follow system)">&#9684;</button></li>
         </ul>
     </nav>
 
@@ -51,8 +54,10 @@
         </article>
     </main>
 
-    <footer>
+    <footer class="site-footer">
         <p>&copy; 2025 Peirong LI's Blog. All rights reserved.</p>
     </footer>
+    <button class="to-top" type="button" aria-label="Back to top">&uarr;</button>
+    <script src="../assets/main.js" defer></script>
 </body>
 </html>

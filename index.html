@@ -4,73 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peirong LI's Personal Website</title>
+    <meta name="description" content="Personal website of Peirong LI — MSc Computer Science (Georgia Tech, CUHK). Research, projects and experiences in HCI, AI and games.">
     <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
     <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
-    <header>
-        <h2>Welcome to my personal site !</h2>
+    <div class="progress-bar" aria-hidden="true"></div>
+
+    <header class="site-header">
+        <p class="tagline">Welcome to my personal site!</p>
+        <p class="type-line" aria-hidden="true"><span id="typewriter"></span><span class="cursor">|</span></p>
     </header>
 
-    <nav>
+    <nav class="site-nav" aria-label="Main">
         <ul>
             <li><a href="#about">About</a></li>
+            <li><a href="#education">Education</a></li>
+            <li><a href="#experience">Experience</a></li>
             <li><a href="#news">News</a></li>
-            <li><a href="#researches">Researches</a></li>
+            <li><a href="#researches">Research</a></li>
             <li><a href="#projects">Projects</a></li>
-            <li><a href="#extra">Extra</a></li>
+            <li><a href="#extra">More</a></li>
             <li><a href="blog.html">Blog</a></li>
+            <li class="theme-item"><button id="theme-toggle" type="button" aria-label="Theme: auto (follow system)">&#9684;</button></li>
         </ul>
     </nav>
 
     <main>
-        <figure>
-            <img style='height: 50%; width: 50%; object-fit: contain' src="./assets/images/compressed.jpg">
-            <figcaption>Shot at Gatech in Spring 24 before graduation</figcaption>
-        </figure>
-        <section id="about"> 
-            <h2 style="color:blue;">Peirong LI</h2>
-            <h3>Education</h3>
-            <ul>
-                <li>2022.08 – 2024.05: Masters of Science in Computer Science at Georgia Institute of Technology</li>
-                <li>2022.07: Globex program at Peking University</li>
-                <li>2019.07: Summer exchange at UCL</li>
-                <li>2018.09 – 2022.07: Bachelor of Science in Computer Science at the Chinese University of Hong Kong</li>
+        <section id="about" class="hero">
+            <div class="hero-intro">
+                <h1>Peirong LI</h1>
+                <!-- Draft intro — tweak the wording as you like -->
+                <p class="bio">MSc in Computer Science at Georgia Institute of Technology, BSc at the Chinese University of Hong Kong. Now focused on AI product management — exploring how AI products get shaped, built and shipped. Also a gamer, occasionally joining game jams and product training camps.</p>
+                <ul class="contact-list">
+                    <li>Email: <a href="mailto:peirongli9890@outlook.com">peirongli9890@outlook.com</a> <button id="copy-email" class="copy-btn" type="button" aria-label="Copy email address">Copy</button></li>
+                    <!--
+                    <li>Google Voice: (+1) 470-795-2933</li>
+                    -->
+                </ul>
+            </div>
+            <figure class="hero-photo">
+                <span class="avatar-ring">
+                    <img src="./assets/images/compressed.jpg" alt="Portrait of Peirong LI, shot at Georgia Tech in Spring 2024 before graduation">
+                </span>
+                <figcaption>Shot at Gatech in Spring 24 before graduation</figcaption>
+            </figure>
+        </section>
+
+        <section id="journey">
+            <h2 id="education">Education</h2>
+            <ul class="timeline">
+                <li><span class="date">2022.08 – 2024.05</span><span class="item">Masters of Science in Computer Science at Georgia Institute of Technology</span></li>
+                <li><span class="date">2022.07</span><span class="item">Globex program at Peking University</span></li>
+                <li><span class="date">2019.07</span><span class="item">Summer exchange at UCL</span></li>
+                <li><span class="date">2018.09 – 2022.07</span><span class="item">Bachelor of Science in Computer Science at the Chinese University of Hong Kong</span></li>
             </ul>
-            <h3>Experiences</h3>
-            <ul>
-                <li>2026.08 - 09: China Mobile Summer Intern Program</li>
-                <li>2026.07: OPPO Color &pi; Practical Training Camp</li>
-                <li>2026.04 - 06: Intern on Project Craft</li>
-                <li>2026.01 - 03: China Mobile Winter Intern Program</li>
-                <li>2025.11 - 12: Tencent Game Design Training Camp</li>
-                <li>2025.10: Agentland Fortnight Game Jam Vol.4</li>
-                <li>2025.07: Tencent Future Product Manager Training Camp</li>
-                <li>2025.05: DataWhale Spring Training Camp</li>
-                <li>2025.01 - 04: Tencent AIGC & Gameplay Project</li>
-            </ul>
+                <h2 id="experience">Experiences</h2>
+                <div class="scroll-box" tabindex="0" aria-label="Experiences, scroll to see earlier entries">
+                    <ul class="timeline">
+                        <li><span class="date">2026.08 - 09</span><span class="item">China Mobile Summer Intern Program</span></li>
+                        <li><span class="date">2026.07</span><span class="item">OPPO Color &pi; Practical Training Camp</span></li>
+                        <li><span class="date">2026.04 - 06</span><span class="item">Intern on Project Craft</span></li>
+                        <li><span class="date">2026.01 - 03</span><span class="item">China Mobile Winter Intern Program</span></li>
+                        <li><span class="date">2025.11 - 12</span><span class="item">Tencent Game Design Training Camp</span></li>
+                        <li><span class="date">2025.10</span><span class="item">Agentland Fortnight Game Jam Vol.4</span></li>
+                        <li><span class="date">2025.07</span><span class="item">Tencent Future Product Manager Training Camp</span></li>
+                        <li><span class="date">2025.05</span><span class="item">DataWhale Spring Training Camp</span></li>
+                        <li><span class="date">2025.01 - 04</span><span class="item">Tencent AIGC &amp; Gameplay Project</span></li>
+                    </ul>
+                </div>
             <!--
-            <h3>Research interests</h3>
-            
+            <h2>Research interests</h2>
+
             <ul>
                 <li>Education</li>
                 <li>Elderly support & Healthcare</li>
                 <li>AI-HCI</li>
             </ul>
-            
+
             <figure>
-                <img style='height: 100%; width: 100%; object-fit: contain' src="./assets/images/research_direction.png">
+                <img src="./assets/images/research_direction.png">
             </figure>
             -->
-            <h3>Contact</h3>
-            <ul>
-                <li>Email: peirongli9890@outlook.com</li>
-                <!--
-                <li>Google Voice: (+1) 470-795-2933</li>
-                -->
-            </ul>
         </section>
-        
+</section>
+
         <!--
         <section id="contact">
             <h2>Contact Me</h2>
@@ -79,68 +97,99 @@
             <p>Phone: (+1) 470-795-2933</p>
         </section>
         -->
+
         <section id="news">
-            <h2 style="color:red;">Recent news</h2>
-            <ul>
-                <li>2024.05: Graduated from Gatech MSCS &#128526 (<a href="https://www.youtube.com/live/9AJNDDprWp8?si=7UgUnZfZGAs-EiLP">graduation ceremony</a> on May 4th: find me at 2:17:09)</li>
-                <li>2022.07: Graduared from CUHK BSc CS &#128512</li>
+            <h2>Recent news</h2>
+            <ul class="timeline">
+                <li><span class="date">2024.05</span><span class="item">Graduated from Gatech MSCS &#128526; (<a href="https://www.youtube.com/live/9AJNDDprWp8?si=7UgUnZfZGAs-EiLP">graduation ceremony</a> on May 4th: find me at 2:17:09)</span></li>
+                <li><span class="date">2022.07</span><span class="item">Graduated from CUHK BSc CS &#128512;</span></li>
             </ul>
         </section>
 
         <section id="researches">
-            <h2 style="color:purple;">Research experiences</h2>
-            <ul>
-                <li><a href="https://drive.google.com/file/d/1oGuDF0vhZJ-0N5XiEuzJkJm6AS3bM2rJ/view?usp=sharing">Tangible User Interface & Cognitive-Motor Dual Task Training for aMCI patients</a> (Summer 2025)</li>
-                <!--
-                <li><a href="https://drive.google.com/file/d/1MztcmazkHzIk06LfLI5RWpV0umhwfnHc/view?usp=sharing">VR & Animal Aging</a> (Spring 2024)</li>
-                <li><a href="https://drive.google.com/file/d/18KGKrAyKov3vDxwuCQNKxwxHG2cqXcRN/view?usp=sharing">Service Robot & Elderly Support</a> (Summer 2023)</li> 
-                <li><a href="https://drive.google.com/file/d/1XDYgmklaNe40y_flZ6bZybTnQkVvHjnX/view?usp=sharing">Gamification & Education</a> (Spring 2023)</li>
-                -->
-                <li><a href="https://drive.google.com/file/d/1At2ZEbmicCIk2SArg_VGKu93d4AmQ7_z/view?usp=sharing">Open Wi-Fi & Time Synchronization</a> (Summer 2019)</li>
+            <h2>Research experiences</h2>
+            <ul class="card-grid">
+                <li>
+                    <span class="badge">Summer 2025</span>
+                    <a href="https://drive.google.com/file/d/1oGuDF0vhZJ-0N5XiEuzJkJm6AS3bM2rJ/view?usp=sharing">Tangible User Interface &amp; Cognitive-Motor Dual Task Training for aMCI patients</a>
+                    <!--
+                    <span class="badge">Spring 2024</span>
+                    <a href="https://drive.google.com/file/d/1MztcmazkHzIk06LfLI5RWpV0umhwfnHc/view?usp=sharing">VR & Animal Aging</a>
+                    <span class="badge">Summer 2023</span>
+                    <a href="https://drive.google.com/file/d/18KGKrAyKov3vDxwuCQNKxwxHG2cqXcRN/view?usp=sharing">Service Robot & Elderly Support</a>
+                    <span class="badge">Spring 2023</span>
+                    <a href="https://drive.google.com/file/d/1XDYgmklaNe40y_flZ6bZybTnQkVvHjnX/view?usp=sharing">Gamification & Education</a>
+                    -->
+                </li>
+                <li>
+                    <span class="badge">Summer 2019</span>
+                    <a href="https://drive.google.com/file/d/1At2ZEbmicCIk2SArg_VGKu93d4AmQ7_z/view?usp=sharing">Open Wi-Fi &amp; Time Synchronization</a>
+                </li>
             </ul>
         </section>
 
         <section id="projects">
-            <h2 style="color:green;">Projects</h2>
-            <ul>
-                <li><a href="https://github.com/peirongli/Note-Jarvis">Note Jarvis</a> (AI note agent)</li>
-                <li><a href="https://github.com/peirongli/LearnPilot">Learn Pilot</a> (AI study path generator; with built-in Python tutor)</li>
-                <li><a href="https://drive.google.com/file/d/18PpcsK4pwg0OO52A-XQmOyGZIE2LCOFH/view?usp=sharing">Smart Rock-Paper-Scissors</a> (playable on <a href="https://space.agentlandlab.com/games/smart_rps">Agentland Space</a>)</li>
+            <h2>Projects</h2>
+            <ul class="card-grid">
+                <li>
+                    <span class="badge">GitHub</span>
+                    <a href="https://github.com/peirongli/Note-Jarvis">Note Jarvis</a>
+                    <p class="card-note">AI note agent</p>
+                </li>
+                <li>
+                    <span class="badge">GitHub</span>
+                    <a href="https://github.com/peirongli/LearnPilot">Learn Pilot</a>
+                    <p class="card-note">AI study path generator; with built-in Python tutor</p>
+                </li>
+                <li>
+                    <span class="badge">Playable</span>
+                    <a href="https://drive.google.com/file/d/18PpcsK4pwg0OO52A-XQmOyGZIE2LCOFH/view?usp=sharing">Smart Rock-Paper-Scissors</a>
+                    <p class="card-note">Play it online on <a href="https://space.agentlandlab.com/games/smart_rps">Agentland Space</a></p>
+                </li>
                 <!--
-                <li><a href="https://github.com/peirongli/intern-hunter">Intern Hunter</a></li>
-                <li><a href="https://drive.google.com/file/d/1wXljCcAbhTpNztfWesmE28Ws-RrunmBa/view?usp=sharing">ED Lessons interface redesign</a></li>
+                <li><span class="badge">GitHub</span><a href="https://github.com/peirongli/intern-hunter">Intern Hunter</a></li>
+                <li><span class="badge">Redesign</span><a href="https://drive.google.com/file/d/1wXljCcAbhTpNztfWesmE28Ws-RrunmBa/view?usp=sharing">ED Lessons interface redesign</a></li>
                 -->
             </ul>
         </section>
 
         <section id="extra">
             <!--
-            <h3 style="color:yellow;">Recent book reading</h3>
+            <h3>Recent book reading</h3>
             <ul>
                 <li><i>The Island of Yesterday</i> by DAI Jinhua</li>
                 <li><i>Everyone Can Be A Product Manager</i> by SU Jie</li>
                 <li><i>Chasing Doctor Dolittle: Learning the Language of Animals</i> by Con Slobodchikoff</li>
                 <li>...</li>
             </ul>
-            
+
             <h3>Blogs</h3>
             <ul>
                 <li>Not written yet</li>
             </ul>
             -->
-            <h3 style="color:orange;">Quick facts</h3>
-            <ul>
-                <li>MBTI: ISFJ</li>
-                <li>Hobbies: travelling ('ve been to USA, UK, Japan, Korea); gaming (on mobile, PC, Switch); reading; movies</li>
-                <li>Languages: Mandarin, English</li>
-                <li>Favorite quote: <i>“Don't ever let someone tell you, you can't do something. Not even me. You got a dream, you got to protect it. People can’t do something themselves, they want to tell you you can’t do it. You want something, go get it. Period.”</i> ― Pursuit of Happyness</li>
+            <h2>Quick facts</h2>
+            <ul class="chips">
+                <li class="chip-purple">MBTI: ISFJ</li>
+                <li class="chip-teal">Languages: Mandarin · English</li>
+                <li class="chip-amber">Travelling: USA · UK · Japan · Korea</li>
+                <li class="chip-coral">Gaming: mobile · PC · Switch</li>
+                <li class="chip-blue">Reading</li>
+                <li class="chip-purple">Movies</li>
             </ul>
+            <blockquote>
+                <p>&ldquo;Don't ever let someone tell you, you can't do something. Not even me. You got a dream, you got to protect it. People can&rsquo;t do something themselves, they want to tell you you can&rsquo;t do it. You want something, go get it. Period.&rdquo;</p>
+                <cite>― Pursuit of Happyness</cite>
+            </blockquote>
         </section>
-     
     </main>
 
-    <footer>
+    <footer class="site-footer">
         <p>&copy; 2025 Peirong LI's Personal Website. All rights reserved.</p>
     </footer>
+
+    <button class="to-top" type="button" aria-label="Back to top">&uarr;</button>
+    <div class="toast" role="status" aria-live="polite"></div>
+    <script src="./assets/main.js" defer></script>
 </body>
 </html>

@@ -4,26 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peirong LI's Blog</title>
+    <meta name="description" content="Blog of Peirong LI — tech notes, life stories and travel diaries.">
     <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
     <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
-    <header>
-        <h2>My Blog</h2>
+    <div class="progress-bar" aria-hidden="true"></div>
+    <header class="site-header">
+        <p class="tagline">My Blog</p>
     </header>
 
-    <nav>
+    <nav class="site-nav" aria-label="Main">
         <ul>
             <li><a href="index.html">Home</a></li>
             <li><a href="#tech">Tech</a></li>
             <li><a href="#life">Life</a></li>
             <li><a href="#travel">Travel</a></li>
         </ul>
+            <li class="theme-item"><button id="theme-toggle" type="button" aria-label="Theme: auto (follow system)">&#9684;</button></li>
+        </ul>
     </nav>
 
     <main>
         <section id="tech">
-            <h2 style="color:blue;">Tech Posts</h2>
+            <h2>Tech Posts</h2>
             <ul class="blog-list">
                 <li>
                     <h3><a href="posts/welcome.html">Welcome to My Blog</a></h3>
@@ -33,23 +37,25 @@
             </ul>
         </section>
 
-        <section id="life">
-            <h2 style="color:green;">Life Stories</h2>
+        <section id="life" hidden>
+            <h2>Life Stories</h2>
             <ul class="blog-list">
                 <!-- Blog posts will be added here -->
             </ul>
         </section>
 
-        <section id="travel">
-            <h2 style="color:purple;">Travel Diaries</h2>
+        <section id="travel" hidden>
+            <h2>Travel Diaries</h2>
             <ul class="blog-list">
                 <!-- Blog posts will be added here -->
             </ul>
         </section>
     </main>
 
-    <footer>
+    <footer class="site-footer">
         <p>&copy; 2025 Peirong LI's Blog. All rights reserved.</p>
     </footer>
+    <button class="to-top" type="button" aria-label="Back to top">&uarr;</button>
+    <script src="./assets/main.js" defer></script>
 </body>
 </html>
