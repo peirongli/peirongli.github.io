@@ -190,4 +190,230 @@
       }(p), 1300);
     }
   }
+
+  /* ---- Snake mini-game (floating button + modal) ---- */
+  var fab = document.getElementById('game-fab');
+  var gameModal = document.getElementById('game-modal');
+  if (fab && gameModal) {
+    var canvas = document.getElementById('snake-canvas');
+    var ctx = canvas.getContext('2d');
+    var scoreEl = document.getElementById('snake-score');
+    var bestEl = document.getElementById('snake-best');
+    var toggleBtn = document.getElementById('snake-toggle');
+
+    var GRID = 15;
+    var CELL = canvas.width / GRID;
+    var BASE_MS = 170;
+    var MIN_MS = 80;
+
+    var snake, dir, nextDir, food, score, dead, running, timer, interval;
+    var best = 0;
+    try { best = parseInt(localStorage.getItem('snake-best'), 10) || 0; } catch (e) {}
+    bestEl.textContent = best;
+
+    function cssVar(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function randCell() {
+      return Math.floor(Math.random() * GRID);
+    }
+
+    function placeFood() {
+      do {
+        food = { x: randCell(), y: randCell() };
+      } while (snake.some(function (s) { return s.x === food.x && s.y === food.y; }));
+    }
+
+    function resetGame() {
+      snake = [{ x: 7, y: 7 }, { x: 6, y: 7 }, { x: 5, y: 7 }];
+      dir = { x: 1, y: 0 };
+      nextDir = dir;
+      score = 0;
+      dead = false;
+      interval = BASE_MS;
+      scoreEl.textContent = '0';
+      placeFood();
+      draw();
+    }
+
+    function setRunning(run) {
+      running = run;
+      if (run) {
+        timer = setInterval(step, interval);
+      } else if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+      updateToggleBtn();
+    }
+
+    function updateToggleBtn() {
+      toggleBtn.textContent = dead ? 'Restart' : (running ? 'Pause' : (score > 0 ? 'Resume' : 'Start'));
+    }
+
+    function gameOver() {
+      dead = true;
+      setRunning(false);
+      draw();
+    }
+
+    function step() {
+      dir = nextDir;
+      var head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+      if (head.x < 0 || head.y < 0 || head.x >= GRID || head.y >= GRID ||
+          snake.some(function (s) { return s.x === head.x && s.y === head.y; })) {
+        gameOver();
+        return;
+      }
+      snake.unshift(head);
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        scoreEl.textContent = score;
+        if (score > best) {
+          best = score;
+          bestEl.textContent = best;
+          try { localStorage.setItem('snake-best', String(best)); } catch (e) {}
+        }
+        if (score % 4 === 0 && interval > MIN_MS) {
+          interval -= 8;
+          clearInterval(timer);
+          timer = setInterval(step, interval);
+        }
+        placeFood();
+      } else {
+        snake.pop();
+      }
+      draw();
+    }
+
+    function draw() {
+      var bgCell = cssVar('--bg') || '#ffffff';
+      var boardBg = cssVar('--bg-secondary') || '#f8fafc';
+      var bodyColor = cssVar('--accent') || '#667eea';
+      var headColor = cssVar('--accent-hover') || '#5a67d8';
+      var foodColor = cssVar('--coral') || '#e2603f';
+      ctx.fillStyle = boardBg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = foodColor;
+      ctx.beginPath();
+      ctx.arc(food.x * CELL + CELL / 2, food.y * CELL + CELL / 2, CELL / 2 - 3, 0, Math.PI * 2);
+      ctx.fill();
+      snake.forEach(function (s, i) {
+        ctx.fillStyle = i === 0 ? headColor : bodyColor;
+        ctx.fillRect(s.x * CELL + 1.5, s.y * CELL + 1.5, CELL - 3, CELL - 3);
+      });
+      if (dead) {
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.55)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '600 22px ' + cssVar('--sans-font');
+        ctx.textAlign = 'center';
+        ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 10);
+        ctx.font = '14px ' + cssVar('--sans-font');
+        ctx.fillText('Score: ' + score + ' \u2014 press Restart', canvas.width / 2, canvas.height / 2 + 16);
+      }
+    }
+
+    function trySetDir(d) {
+      if (!running) return;
+      if (d.x === -dir.x && d.y === -dir.y && snake.length > 1) return;
+      nextDir = d;
+    }
+
+    var DIRS = {
+      up: { x: 0, y: -1 }, down: { x: 0, y: 1 },
+      left: { x: -1, y: 0 }, right: { x: 1, y: 0 }
+    };
+    var KEY_DIR = {
+      ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+      w: 'up', s: 'down', a: 'left', d: 'right',
+      W: 'up', S: 'down', A: 'left', D: 'right'
+    };
+
+    function openGame() {
+      gameModal.hidden = false;
+      document.body.classList.add('modal-open');
+      fab.style.visibility = 'hidden';
+      resetGame();
+      setRunning(false);
+      updateToggleBtn();
+    }
+
+    function closeGame() {
+      setRunning(false);
+      gameModal.hidden = true;
+      document.body.classList.remove('modal-open');
+      fab.style.visibility = 'visible';
+      resetGame();
+    }
+
+    fab.addEventListener('click', openGame);
+    document.getElementById('game-close').addEventListener('click', closeGame);
+    gameModal.addEventListener('click', function (e) {
+      if (e.target === gameModal) closeGame();
+    });
+
+    toggleBtn.addEventListener('click', function () {
+      if (dead) {
+        resetGame();
+        setRunning(true);
+      } else {
+        setRunning(!running);
+      }
+    });
+
+    window.addEventListener('keydown', function (e) {
+      if (gameModal.hidden) return;
+      if (e.key === 'Escape') {
+        closeGame();
+        return;
+      }
+      if (e.key === ' ') {
+        e.preventDefault();
+        if (dead) {
+          resetGame();
+          setRunning(true);
+        } else {
+          setRunning(!running);
+        }
+        return;
+      }
+      var d = KEY_DIR[e.key];
+      if (d) {
+        e.preventDefault();
+        trySetDir(DIRS[d]);
+      }
+    });
+
+    Array.prototype.forEach.call(gameModal.querySelectorAll('.dpad button'), function (b) {
+      b.addEventListener('click', function () {
+        trySetDir(DIRS[b.getAttribute('data-dir')]);
+      });
+    });
+
+    var touchStart = null;
+    canvas.addEventListener('touchstart', function (e) {
+      touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }, { passive: true });
+    canvas.addEventListener('touchmove', function (e) {
+      e.preventDefault();
+    }, { passive: false });
+    canvas.addEventListener('touchend', function (e) {
+      if (!touchStart) return;
+      var dx = e.changedTouches[0].clientX - touchStart.x;
+      var dy = e.changedTouches[0].clientY - touchStart.y;
+      touchStart = null;
+      if (Math.abs(dx) < 24 && Math.abs(dy) < 24) return;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        trySetDir(DIRS[dx > 0 ? 'right' : 'left']);
+      } else {
+        trySetDir(DIRS[dy > 0 ? 'down' : 'up']);
+      }
+    });
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden && running) setRunning(false);
+    });
+  }
 })();
