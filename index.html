@@ -35,7 +35,7 @@
             <div class="hero-intro">
                 <h1>Peirong LI</h1>
                 <!-- Draft intro — tweak the wording as you like -->
-                <p class="bio">MSc in Computer Science at Georgia Institute of Technology, BSc at the Chinese University of Hong Kong. Now focused on AI product management — exploring how AI products get shaped, built and shipped. Also a gamer, occasionally joining game jams and product training camps.</p>
+                <p class="bio">MSc in Computer Science at Georgia Institute of Technology, BSc at the Chinese University of Hong Kong. Now focused on AI product management — exploring how AI products get shaped, built and shipped. Also a gamer, occasionally joining game jams and product training camps. Fancy a quick break? Hit the gamepad button floating on the right edge of this page for a round of Snake &#127918;</p>
                 <ul class="contact-list">
                     <li>Email: <a href="mailto:peirongli9890@outlook.com">peirongli9890@outlook.com</a> <button id="copy-email" class="copy-btn" type="button" aria-label="Copy email address">Copy</button></li>
                     <!--
@@ -189,6 +189,29 @@
     </footer>
 
     <button class="to-top" type="button" aria-label="Back to top">&uarr;</button>
+    <button id="game-fab" type="button" aria-label="Play Snake" title="Play Snake">&#127918;</button>
+
+    <div id="game-modal" class="game-modal" hidden>
+        <div class="game-dialog" role="dialog" aria-modal="true" aria-label="Snake game">
+            <div class="game-head">
+                <strong>Snake</strong>
+                <span class="game-scores">Score <b id="snake-score">0</b> · Best <b id="snake-best">0</b></span>
+                <button id="game-close" class="game-close" type="button" aria-label="Close game">&#10005;</button>
+            </div>
+            <canvas id="snake-canvas" width="300" height="300"></canvas>
+            <div class="game-controls">
+                <button id="snake-toggle" class="game-btn" type="button">Start</button>
+                <div class="dpad" aria-label="Direction buttons">
+                    <button type="button" data-dir="up" aria-label="Up">&#9650;</button>
+                    <button type="button" data-dir="left" aria-label="Left">&#9664;</button>
+                    <button type="button" data-dir="down" aria-label="Down">&#9660;</button>
+                    <button type="button" data-dir="right" aria-label="Right">&#9654;</button>
+                </div>
+            </div>
+            <p class="game-hint">Arrow keys / WASD / swipe &middot; walls are deadly &middot; Esc to quit</p>
+        </div>
+    </div>
+
     <div class="toast" role="status" aria-live="polite"></div>
     <script src="./assets/main.js" defer></script>
 </body>
