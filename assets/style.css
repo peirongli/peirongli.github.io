@@ -924,3 +924,330 @@ body.modal-open {
   margin: 0.65rem 0 0;
   text-align: center;
 }
+
+/* ============ Portfolio & case studies ============ */
+/* Language toggle: EN (default) <-> 中文 */
+html:not([data-page-lang="zh"]) [data-lang="zh"],
+html[data-page-lang="zh"] [data-lang="en"] {
+  display: none;
+}
+
+#lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.18rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+#lang-toggle button {
+  border: none;
+  background: transparent;
+  color: var(--text-light);
+  height: 1.75rem;
+  min-width: 2.4rem;
+  padding: 0 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+#lang-toggle button.active {
+  background: rgba(var(--accent-rgb), 0.14);
+  color: var(--accent);
+}
+
+#lang-toggle button:not(.active):hover {
+  color: var(--accent);
+}
+
+/* Case hero */
+.case-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.case-sub {
+  color: var(--text-light);
+  font-size: 1.15rem;
+  margin: 0.25rem 0 0.9rem;
+}
+
+.case-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 0.5rem;
+}
+
+.case-meta .badge {
+  margin: 0;
+}
+
+/* Stat band */
+.stat-band {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.8rem;
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.stat-band li {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.95rem 0.8rem;
+  margin: 0;
+  text-align: center;
+  transition: border-color 0.2s ease;
+}
+
+.stat-band li:hover {
+  border-color: rgba(var(--sec-rgb), 0.4);
+}
+
+.stat-num {
+  display: block;
+  font-size: 1.45rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--sec);
+  line-height: 1.2;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+  line-height: 1.45;
+}
+
+/* Tables */
+.table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0 1.5rem;
+}
+
+.case-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.case-table th,
+.case-table td {
+  border: 1px solid var(--border);
+  padding: 0.55rem 0.8rem;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.case-table th {
+  background: var(--bg-secondary);
+  font-weight: 600;
+}
+
+.case-table tr:nth-child(even) td {
+  background: rgba(var(--sec-rgb), 0.04);
+}
+
+/* Lifecycle diagram */
+pre.diagram {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--text-light);
+  margin: 1rem 0 1.5rem;
+}
+
+/* Figure */
+.case-figure {
+  margin: 1.5rem 0;
+}
+
+.case-figure img {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: block;
+}
+
+.case-figure figcaption {
+  margin-top: 0.55rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* Decision cards */
+.decision-grid {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.decision-grid li {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--sec);
+  border-radius: 12px;
+  padding: 1.1rem 1.35rem;
+  margin: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.decision-grid li:hover {
+  border-color: rgba(var(--sec-rgb), 0.45);
+  box-shadow: 0 6px 16px var(--shadow);
+}
+
+.decision-grid h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.08rem;
+  line-height: 1.4;
+}
+
+.decision-grid p {
+  margin: 0.5rem 0;
+  font-size: 0.97rem;
+  color: var(--text-light);
+}
+
+.decision-grid .table-wrap {
+  margin: 0.75rem 0 0.25rem;
+}
+
+/* Callout */
+.callout {
+  border-left: 4px solid var(--sec);
+  background: var(--bg-secondary);
+  border-radius: 0 12px 12px 0;
+  padding: 1rem 1.35rem;
+  margin: 1.25rem 0;
+  font-size: 0.97rem;
+  color: var(--text-light);
+}
+
+.callout p {
+  margin: 0;
+}
+
+.callout strong {
+  color: var(--text);
+}
+
+/* Portfolio list page */
+.case-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.case-list > li {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.4rem 1.6rem;
+  margin: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.case-list > li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px var(--shadow);
+  border-color: rgba(var(--sec-rgb), 0.4);
+}
+
+.case-list h3 {
+  margin: 0.35rem 0 0.45rem;
+  font-size: 1.3rem;
+}
+
+.case-list h3 a {
+  color: var(--text);
+}
+
+.case-list h3 a:hover {
+  color: var(--sec);
+}
+
+.case-list .case-one-liner {
+  color: var(--text-light);
+  margin: 0;
+}
+
+.stat-chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0.9rem 0 0.6rem;
+}
+
+.stat-chips li {
+  margin: 0;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(var(--sec-rgb), 0.10);
+  border: 1px solid rgba(var(--sec-rgb), 0.25);
+  color: var(--sec);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.case-cta {
+  font-weight: 500;
+}
+
+.more-note {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+@media only screen and (max-width: 768px) {
+  .case-list > li {
+    padding: 1.1rem 1.15rem;
+  }
+
+  .stat-band {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============ Portfolio: link badge & source pointers ============ */
+.case-meta a.badge {
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.10);
+  border: 1px solid rgba(var(--accent-rgb), 0.30);
+}
+
+.case-meta a.badge:hover {
+  text-decoration: none;
+  background: rgba(var(--accent-rgb), 0.18);
+}
+
+.case-src {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 1.1rem 0 0;
+}

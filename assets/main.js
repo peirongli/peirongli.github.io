@@ -49,6 +49,43 @@
     });
   }
 
+  /* ---- Language toggle (portfolio pages): EN <-> 中文 ---- */
+  var LANG_KEY = 'page-lang';
+  var langToggle = document.getElementById('lang-toggle');
+
+  function applyLang(lang) {
+    if (lang === 'zh') {
+      root.setAttribute('data-page-lang', 'zh');
+    } else {
+      root.removeAttribute('data-page-lang');
+    }
+    root.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en');
+    if (langToggle) {
+      Array.prototype.forEach.call(
+        langToggle.querySelectorAll('[data-lang-opt]'),
+        function (b) {
+          var active = b.getAttribute('data-lang-opt') === lang;
+          b.classList.toggle('active', active);
+          b.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
+      );
+    }
+  }
+
+  var savedLang = null;
+  try { savedLang = localStorage.getItem(LANG_KEY); } catch (e) {}
+  applyLang(savedLang === 'zh' ? 'zh' : 'en');
+
+  if (langToggle) {
+    langToggle.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-lang-opt]');
+      if (!btn) return;
+      var next = btn.getAttribute('data-lang-opt');
+      try { localStorage.setItem(LANG_KEY, next); } catch (err) {}
+      applyLang(next);
+    });
+  }
+
   /* ---- Reading progress bar + back-to-top ---- */
   var bar = document.querySelector('.progress-bar');
   var toTop = document.querySelector('.to-top');

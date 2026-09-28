@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio · Peirong LI</title>
+    <meta name="description" content="Portfolio of Peirong LI — case studies of AI products, with the evidence attached: eval harnesses, measured trade-offs, and honest limitations.">
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    <link rel="stylesheet" href="./assets/style.css">
+    <script>
+        try {
+            if (localStorage.getItem('page-lang') === 'zh') {
+                document.documentElement.setAttribute('data-page-lang', 'zh');
+                document.documentElement.setAttribute('lang', 'zh-CN');
+            }
+        } catch (e) {}
+    </script>
+</head>
+<body>
+    <div class="progress-bar" aria-hidden="true"></div>
+
+    <header class="site-header">
+        <p class="tagline"><span data-lang="en">Portfolio</span><span data-lang="zh">作品集</span></p>
+    </header>
+
+    <nav class="site-nav" aria-label="Main">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li class="theme-item"><button id="theme-toggle" type="button" aria-label="Theme: auto (follow system)">&#9684;</button></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="works">
+            <div class="case-title-row">
+                <h1>Portfolio</h1>
+                <div class="lang-toggle" id="lang-toggle" role="group" aria-label="Language / 语言">
+                    <button type="button" data-lang-opt="en" class="active">EN</button>
+                    <button type="button" data-lang-opt="zh">中文</button>
+                </div>
+            </div>
+            <p><span data-lang="en">Selected case studies — product work with the evidence attached. Each case documents the problem, the decisions (including the ones I ruled out), the evaluation, and the honest limits of the results.</span><span data-lang="zh">精选案例研究——附带证据的产品工作。每个案例记录问题、关键决策（包括被否掉的方案）、评测方法，以及结果的诚实边界。</span></p>
+            <ul class="case-list">
+                <li>
+                    <span class="badge"><span data-lang="en">AI Product · Solo · 0 to 1</span><span data-lang="zh">AI 产品 · 独立开发 · 从 0 到 1</span></span>
+                    <span class="badge"><span data-lang="en">MIT open source</span><span data-lang="zh">MIT 开源</span></span>
+                    <h3><a href="works/note-jarvis.html">Note Jarvis</a></h3>
+                    <p class="case-one-liner"><span data-lang="en">A local-first AI memory system where every memory is a pull request — extraction with evidence, human-reviewed merges, conflicts that never silently overwrite.</span><span data-lang="zh">本地优先的 AI 记忆系统：每条记忆都是一个 Pull Request——带证据的抽取、人工审查的合并、永不静默覆盖的冲突处理。</span></p>
+                    <ul class="stat-chips">
+                        <li><span data-lang="en">Retrieval MRR 0.95</span><span data-lang="zh">检索 MRR 0.95</span></li>
+                        <li><span data-lang="en">Auto-confirm errors 0%</span><span data-lang="zh">自动确认误判 0%</span></li>
+                        <li><span data-lang="en">External hit@4 0.815</span><span data-lang="zh">外部 hit@4 0.815</span></li>
+                        <li><span data-lang="en">16 eval loops</span><span data-lang="zh">16 个评估闭环</span></li>
+                    </ul>
+                    <p class="case-cta"><a href="works/note-jarvis.html"><span data-lang="en">View case study &rarr;</span><span data-lang="zh">查看案例 &rarr;</span></a></p>
+                </li>
+                <li>
+                    <span class="badge"><span data-lang="en">Playable</span><span data-lang="zh">可玩</span></span>
+                    <span class="badge"><span data-lang="en">Game Jam</span><span data-lang="zh">Game Jam</span></span>
+                    <h3><a href="https://space.agentlandlab.com/games/smart_rps">Smart Rock-Paper-Scissors</a></h3>
+                    <p class="case-one-liner"><span data-lang="en">Rock-paper-scissors against an AI that adapts to your patterns. Playable online, no install.</span><span data-lang="zh">和会适应你出招模式的 AI 玩石头剪刀布。在线可玩，无需安装。</span></p>
+                </li>
+            </ul>
+            <p class="more-note"><span data-lang="en">More case studies are on the way — including an LLM expert-system evaluation program (8-case matrix, 80 formal runs, control groups) from my industry internship.</span><span data-lang="zh">更多案例整理中——包括来自企业实习的大模型专家系统评测项目（8 案例矩阵、80 次正式运行、含对照组）。</span></p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Peirong LI's Personal Website. All rights reserved.</p>
+    </footer>
+
+    <button class="to-top" type="button" aria-label="Back to top">&uarr;</button>
+    <script src="./assets/main.js" defer></script>
+</body>
+</html>

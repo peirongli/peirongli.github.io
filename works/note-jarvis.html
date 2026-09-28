@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note Jarvis — Case Study · Peirong LI</title>
+    <meta name="description" content="Case study: Note Jarvis, a local-first AI memory system where every memory is a pull request. Eval-driven product decisions, measured trade-offs, open source.">
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script>
+        try {
+            if (localStorage.getItem('page-lang') === 'zh') {
+                document.documentElement.setAttribute('data-page-lang', 'zh');
+                document.documentElement.setAttribute('lang', 'zh-CN');
+            }
+        } catch (e) {}
+    </script>
+</head>
+<body>
+    <div class="progress-bar" aria-hidden="true"></div>
+
+    <header class="site-header">
+        <p class="tagline"><span data-lang="en">Case Study · Note Jarvis</span><span data-lang="zh">案例研究 · Note Jarvis</span></p>
+    </header>
+
+    <nav class="site-nav" aria-label="Main">
+        <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../portfolio.html">Portfolio</a></li>
+            <li><a href="#problem"><span data-lang="en">Problem</span><span data-lang="zh">问题</span></a></li>
+            <li><a href="#decisions"><span data-lang="en">Decisions</span><span data-lang="zh">决策</span></a></li>
+            <li><a href="#evaluation"><span data-lang="en">Evaluation</span><span data-lang="zh">评测</span></a></li>
+            <li><a href="#results"><span data-lang="en">Results</span><span data-lang="zh">结果</span></a></li>
+            <li class="theme-item"><button id="theme-toggle" type="button" aria-label="Theme: auto (follow system)">&#9684;</button></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section class="case-hero">
+            <div class="case-title-row">
+                <h1>Note Jarvis</h1>
+                <div class="lang-toggle" id="lang-toggle" role="group" aria-label="Language / 语言">
+                    <button type="button" data-lang-opt="en" class="active">EN</button>
+                    <button type="button" data-lang-opt="zh">中文</button>
+                </div>
+            </div>
+            <p class="case-sub"><span data-lang="en">A local-first AI memory system where every memory is a pull request.</span><span data-lang="zh">本地优先的 AI 记忆系统：每条记忆都是一个 Pull Request。</span></p>
+            <div class="case-meta">
+                <span class="badge"><span data-lang="en">Solo project</span><span data-lang="zh">独立项目</span></span>
+                <span class="badge"><span data-lang="en">0 to 1</span><span data-lang="zh">从 0 到 1</span></span>
+                <span class="badge"><span data-lang="en">MIT open source</span><span data-lang="zh">MIT 开源</span></span>
+                <span class="badge"><span data-lang="en">Local-first · LLM optional</span><span data-lang="zh">默认本地 · LLM 可选</span></span>
+                <a class="badge badge-link" href="https://github.com/peirongli/Note-Jarvis" title="GitHub"><span data-lang="en">GitHub repo &#8599;</span><span data-lang="zh">GitHub 仓库 &#8599;</span></a>
+            </div>
+            <p><span data-lang="en">Note Jarvis captures raw notes, extracts candidate facts with evidence, and — instead of silently writing them to memory — opens each one for human review. High-confidence facts backed by an exact quote can auto-confirm; everything else waits in a PR-style queue. When a new fact contradicts a confirmed one, nothing is overwritten: the conflict surfaces as a proposal carrying both versions, and you decide which survives.</span><span data-lang="zh">Note Jarvis 捕获原始笔记，抽取带证据的候选事实——但不静默写入记忆，而是把每一条都交给人来审查。高置信且引文精确的事实可以自动确认，其余进入 PR 式审查队列。当新事实与已确认事实矛盾时，从不覆盖：冲突以同时携带两个版本的提案浮出，由你决定哪条存续。</span></p>
+            <ul class="stat-band">
+                <li>
+                    <span class="stat-num">0.95</span>
+                    <span class="stat-label"><span data-lang="en">Retrieval MRR</span><span data-lang="zh">检索 MRR</span></span>
+                </li>
+                <li>
+                    <span class="stat-num">0%</span>
+                    <span class="stat-label"><span data-lang="en">Auto-confirm error rate (from 16.7%)</span><span data-lang="zh">自动确认误判率（从 16.7%）</span></span>
+                </li>
+                <li>
+                    <span class="stat-num">0.815</span>
+                    <span class="stat-label"><span data-lang="en">External hit@4 · 500 Q, pure local</span><span data-lang="zh">外部 hit@4 · 500 题，纯本地</span></span>
+                </li>
+                <li>
+                    <span class="stat-num">16</span>
+                    <span class="stat-label"><span data-lang="en">Closed eval loops</span><span data-lang="zh">评估修复闭环</span></span>
+                </li>
+                <li>
+                    <span class="stat-num">$0</span>
+                    <span class="stat-label"><span data-lang="en">Cost per run · zero API calls</span><span data-lang="zh">每次运行成本 · 零 API 调用</span></span>
+                </li>
+            </ul>
+        </section>
+
+        <section id="problem">
+            <h2><span data-lang="en">The problem</span><span data-lang="zh">问题</span></h2>
+            <p><strong data-lang="en">Personal:</strong><strong data-lang="zh">个人层面：</strong> <span data-lang="en">I take notes constantly — meeting takeaways, project decisions, half-formed ideas — and then never see most of them again. When a decision comes up later, the context I need is buried in a note I forgot I wrote.</span><span data-lang="zh">我记了大量笔记——会议要点、项目决策、灵感碎片——然后其中九成再也没有被看过。等到做决策需要上下文时，它埋在一条我忘了写过的笔记里。</span></p>
+            <p><strong data-lang="en">Industry:</strong><strong data-lang="zh">行业层面：</strong> <span data-lang="en">every AI memory product on the market makes the same trade-off on the user's behalf, without asking:</span><span data-lang="zh">市面上所有 AI 记忆产品都替用户做了同一个权衡，而没有问过用户：</span></p>
+            <div class="table-wrap" data-lang="en">
+                <table class="case-table">
+                    <thead>
+                        <tr><th>Product</th><th>Write policy</th><th>Conflict handling</th><th>Auditability</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>ChatGPT memory</td><td>fully automatic</td><td>silently replaces</td><td>post-hoc &ldquo;sources&rdquo; view</td></tr>
+                        <tr><td>Mem0 v3</td><td>ADD-only, never overwrite</td><td>deferred to retrieval ranking</td><td>none for consumers</td></tr>
+                        <tr><td>Letta (ADE)</td><td>agent edits its own memory</td><td>background agent reconciliation</td><td>developer tooling</td></tr>
+                        <tr><td><strong>Note Jarvis</strong></td><td><strong>proposed with evidence, human-reviewed</strong></td><td><strong>human arbitration</strong></td><td><strong>built-in, per-fact provenance</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-wrap" data-lang="zh">
+                <table class="case-table">
+                    <thead>
+                        <tr><th>产品</th><th>写入策略</th><th>冲突处理</th><th>可审计性</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>ChatGPT memory</td><td>全自动</td><td>静默替换</td><td>事后&ldquo;来源&rdquo;视图</td></tr>
+                        <tr><td>Mem0 v3</td><td>只增不覆盖</td><td>推迟到检索排序</td><td>消费者侧无</td></tr>
+                        <tr><td>Letta (ADE)</td><td>Agent 自行编辑记忆</td><td>后台 Agent 调和</td><td>面向开发者</td></tr>
+                        <tr><td><strong>Note Jarvis</strong></td><td><strong>带证据提案，人工审查</strong></td><td><strong>人工仲裁</strong></td><td><strong>内建，逐条溯源</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p><span data-lang="en">Mem0 retreating from automatic conflict resolution to &ldquo;keep everything, sort it out at read time&rdquo; is an implicit admission that auto-resolve is unreliable. ChatGPT going fully automatic traded auditability away for convenience. I wanted the opposite bet: keep the human in the loop at write time, where the cost of review is lowest and provenance is exact.</span><span data-lang="zh">Mem0 从自动冲突解决退到&ldquo;全都保留、读取时排序&rdquo;，等于官方承认自动解决不可靠；ChatGPT 转全自动更新，是用可审计性换了便利。我想下注另一条路线：把人留在写入时刻的回路里——此时审查成本最低、出处最精确。</span></p>
+            <p class="case-src"><span data-lang="en">Product scope, roadmap, and the &ldquo;explicitly won&rsquo;t do&rdquo; list: <a href="https://github.com/peirongli/Note-Jarvis/blob/main/docs/PRD.md">docs/PRD.md</a>.</span><span data-lang="zh">产品范围、路线图与&ldquo;明确不做&rdquo;清单见 <a href="https://github.com/peirongli/Note-Jarvis/blob/main/docs/PRD.md">docs/PRD.md</a>。</span></p>
+        </section>
+
+        <section id="product">
+            <h2><span data-lang="en">How it works</span><span data-lang="zh">工作方式</span></h2>
+            <pre class="diagram" aria-label="Memory lifecycle diagram">capture ──► structured note ──► extraction ──► policy gate ──► merge decision ──► memory store
+                                     │              │               │
+                              evidenceQuote    auto-confirm      ADD / UPDATE / CONFLICT
+                              per fact         only for exact-   (CONFLICT always waits
+                              + confidence     quote, high-      for human arbitration)
+                                               confidence facts</pre>
+            <ul>
+                <li><span data-lang="en"><strong>Extraction</strong> works in English and Chinese, pulls every memorable sentence (not just the first match), and attaches the exact evidence quote and a tiered confidence to each candidate.</span><span data-lang="zh"><strong>抽取</strong>支持中英双语，抓取每一条值得记住的句子（而非只取第一条匹配），并为每个候选事实附上精确的证据引文与分层置信度。</span></li>
+                <li><span data-lang="en"><strong>The policy gate</strong> auto-confirms only facts that pass four hard conditions: confidence &ge; 0.9, an exact quote, non-hedged, non-sensitive. Everything else waits in a review queue. Auto-confirm can be disabled with one env flag.</span><span data-lang="zh"><strong>策略门</strong>只放行同时满足四个硬条件的事实自动入库：置信度 &ge; 0.9、精确引文、非对冲表述、非敏感；其余全部进入审查队列，且可用一个环境变量整体关闭自动确认。</span></li>
+                <li><span data-lang="en"><strong>Three-state merge</strong>: new facts are added, restatements strengthen the original, contradictions become proposals that challenge the confirmed memory until the user decides. Superseded facts keep a chain — nothing is ever silently deleted.</span><span data-lang="zh"><strong>三态合并</strong>：新事实 ADD、重述强化原事实、矛盾生成 CONFLICT 提案，等用户裁决；被取代的事实保留完整 supersede 链——任何数据都不会被静默删除。</span></li>
+            </ul>
+            <figure class="case-figure">
+                <img src="../assets/images/pr-queue.png" alt="Memory PR review queue: proposal cards with type badge, confidence tier, evidence quote and source">
+                <figcaption><span data-lang="en">The review queue: every proposal carries its type, confidence and the exact quote from your own note. Conflict cards show both versions side by side.</span><span data-lang="zh">审查队列：每条提案都携带类型、置信度和来自你笔记原文的精确引文。冲突卡片并排展示两个版本。</span></figcaption>
+            </figure>
+            <p><span data-lang="en">Storage is plain files — markdown notes, JSON memory, a rebuildable index. No database, no install, no account, no API key. Files are the source of truth: git-diffable, portable, Obsidian-compatible.</span><span data-lang="zh">存储是纯文件：markdown 笔记 + JSON 记忆 + 可重建索引。没有数据库、没有安装、没有账号、没有 API key。文件即真相：可 git diff、可迁移、兼容 Obsidian。</span></p>
+        </section>
+
+        <section id="decisions">
+            <h2><span data-lang="en">Key decisions, and what I ruled out</span><span data-lang="zh">关键决策，以及被否掉的方案</span></h2>
+            <p><span data-lang="en">Every decision below is recorded with its options, evidence, costs, and revisit conditions in <a href="https://github.com/peirongli/Note-Jarvis/blob/main/docs/TRADEOFFS.md">docs/TRADEOFFS.md</a> &mdash; the point is proving &ldquo;every decision has evidence and cost awareness&rdquo;, not post-hoc rationalization.</span><span data-lang="zh">以下每条决策的选项、证据、代价和重访条件都完整记录在 <a href="https://github.com/peirongli/Note-Jarvis/blob/main/docs/TRADEOFFS.md">docs/TRADEOFFS.md</a>——目的是证明&ldquo;每个决策都有证据和代价意识&rdquo;，而不是事后合理化。</span></p>
+            <ul class="decision-grid">
+                <li>
+                    <h3><span data-lang="en">1 · Local heuristics over LLM extraction — decided by measurement, not by faith</span><span data-lang="zh">1 · 本地启发式而非 LLM 抽取——由测量决定，不靠信仰</span></h3>
+                    <p><span data-lang="en">I froze the shipped prompt and ran both LLM tiers against the same gold labels:</span><span data-lang="zh">冻结产品实际使用的 prompt，在同一套 gold 标注上对比两档 LLM：</span></p>
+                    <div class="table-wrap" data-lang="en">
+                        <table class="case-table">
+                            <thead><tr><th></th><th>Type contract</th><th>Keyword-only recall</th><th>Cost per run</th></tr></thead>
+                            <tbody>
+                                <tr><td>Local heuristics</td><td><strong>100%</strong></td><td><strong>100%</strong></td><td><strong>$0</strong></td></tr>
+                                <tr><td>deepseek-flash</td><td>22.2%</td><td>83.3%</td><td>$0.0052</td></tr>
+                                <tr><td>deepseek-v4-pro</td><td>16.7%</td><td>77.8%</td><td>$0.0233</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-wrap" data-lang="zh">
+                        <table class="case-table">
+                            <thead><tr><th></th><th>类型契约达标率</th><th>关键词召回</th><th>每次成本</th></tr></thead>
+                            <tbody>
+                                <tr><td>本地启发式</td><td><strong>100%</strong></td><td><strong>100%</strong></td><td><strong>$0</strong></td></tr>
+                                <tr><td>deepseek-flash</td><td>22.2%</td><td>83.3%</td><td>$0.0052</td></tr>
+                                <tr><td>deepseek-v4-pro</td><td>16.7%</td><td>77.8%</td><td>$0.0233</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p><span data-lang="en">The nuance matters: this is <strong>not</strong> &ldquo;LLMs are bad&rdquo; — it is &ldquo;this prompt + model combination loses to free rules&rdquo; (the prompt lists the type vocabulary but teaches no assignment policy). The revisit conditions are written down: if a model clears 95% on the frozen contract, the decision reopens.</span><span data-lang="zh">细节很重要：这<strong>不是</strong>&ldquo;LLM 不行&rdquo;，而是&ldquo;当前 prompt + 模型组合输给了免费的规则&rdquo;（prompt 只列了类型词表、没教分配策略）。重访条件已写明：若某模型在冻结契约下达到 95%，该决策重新打开。</span></p>
+                </li>
+                <li>
+                    <h3><span data-lang="en">2 · Human arbitration over auto-resolve — because I got burned by my own bug</span><span data-lang="zh">2 · 人工仲裁而非自动覆盖——因为我自己被自己的 bug 教育过</span></h3>
+                    <p><span data-lang="en">An early dedupe bug silently merged conflicting fact pairs on read/write; an old confirmed fact got absorbed with dangling citations. That P0 incident — invisible to unit tests that never passed through the load/save loop — is the strongest evidence for why &ldquo;silently overwrite&rdquo; is the wrong default for a trust product. Conflicts now surface as side-by-side proposals; the user decides with one click.</span><span data-lang="zh">早期一个 dedupe bug 在读写时静默合并了相互冲突的事实对，旧的已确认事实被吸收、引用悬空。这个单测从未暴露的 P0 事故，是对&ldquo;静默覆盖不配当信任型产品默认值&rdquo;最有力的证据。冲突现在以新旧对照的提案形式浮出，用户一次点击完成裁决。</span></p>
+                </li>
+                <li>
+                    <h3><span data-lang="en">3 · An honest regression: stemming won externally, lost internally</span><span data-lang="zh">3 · 一次诚实的回归：词干化在外部赢、在内部输</span></h3>
+                    <p><span data-lang="en">Adding a light English stemmer lifted the external benchmark (lexical hit@4 0.615 &rarr; 0.677) while regressing the internal gold set (lexical MRR 0.946 &rarr; 0.901) — internal queries match the notes' surface forms by construction. I shipped it and documented the trade-off rather than re-tuning the gold set around the fix. External representativeness beats internal perfection.</span><span data-lang="zh">加轻量英文词干化后外部基准提升（lexical hit@4 0.615 &rarr; 0.677），内部 gold set 却回归（lexical MRR 0.946 &rarr; 0.901）——因为内部查询天然使用笔记的表层形式。我选择上线并记录这个 trade-off，而不是围绕修复重调 gold set。外部代表性 &gt; 内部完美分数。</span></p>
+                </li>
+                <li>
+                    <h3><span data-lang="en">4 · A negative result, settled: retrieval-layer abstention</span><span data-lang="zh">4 · 一个定案的负结果：检索层弃答</span></h3>
+                    <p><span data-lang="en">Could the retrieval layer refuse to answer when the corpus doesn't contain the fact? I simulated five rule variants offline across all 500 external questions. Best case: 2 abstention questions fixed, 13 answerable questions wrongly zeroed. No threshold separates the populations — abstention is answer-layer work. Zero code changes shipped; the value was <strong>not</strong> investing further in a wrong direction.</span><span data-lang="zh">检索层能否在&ldquo;语料不含所问事实&rdquo;时拒绝回答？离线模拟了 5 个规则变体、跑完全部 500 道外部题：最好的变体 +2 道弃答修复、&minus;13 道正常题被错杀。两个种群不存在可分阈值——弃答是答案层的职责。零代码变更收口；这条决策的价值在于<strong>避免了在错误方向上继续投入</strong>。</span></p>
+                </li>
+            </ul>
+        </section>
+
+        <section id="evaluation">
+            <h2><span data-lang="en">Evaluation: the harness shipped before the features settled</span><span data-lang="zh">评测：harness 先于功能定型</span></h2>
+            <p><span data-lang="en">AI features without measurement are hypotheses. I built the eval first — it ended up consuming about a third of the shipping time, and at least 3 of the 16 closed loops (the hybrid structural gap, the auto-confirm safety hole, the dedupe P0) <strong>could only have been found by evaluation</strong>.</span><span data-lang="zh">没有度量的 AI 功能只是假设。我先建了评测——它最终占了约三分之一交付工时，而 16 个闭环里至少 3 个（hybrid 结构性漏召回、自动确认安全漏洞、dedupe P0）<strong>只有评测才可能暴露</strong>。</span></p>
+            <div class="table-wrap" data-lang="en">
+                <table class="case-table">
+                    <thead><tr><th>Layer</th><th>What it is</th><th>Headline</th></tr></thead>
+                    <tbody>
+                        <tr><td>Internal gold sets</td><td>59 hand-labelled retrieval queries, 8 adversarial auto-confirm cases, plus classification / memory-recall / governance / decision sets</td><td>MRR 0.950 (lexical) / 0.956 (hybrid); Recall@4 94.2%; auto-confirm FPR 16.7% &rarr; <strong>0%</strong></td></tr>
+                        <tr><td>External benchmark</td><td>LongMemEval-S, 500 independently authored questions, zero API calls</td><td>pure-local hit@4 <strong>0.815</strong> — no LLM, no API key, deterministic</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-wrap" data-lang="zh">
+                <table class="case-table">
+                    <thead><tr><th>层级</th><th>构成</th><th>核心结果</th></tr></thead>
+                    <tbody>
+                        <tr><td>内部 gold 集</td><td>59 条人工标注检索查询、8 例自动确认对抗样本，以及分类 / 记忆召回 / 治理 / 决策等各组件评测集</td><td>MRR 0.950（lexical）/ 0.956（hybrid）；Recall@4 94.2%；自动确认 FPR 16.7% &rarr; <strong>0%</strong></td></tr>
+                        <tr><td>外部基准</td><td>LongMemEval-S，500 道独立编写的问题，零 API 调用</td><td>纯本地 hit@4 <strong>0.815</strong>——无 LLM、无 API key、结果确定</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p><span data-lang="en"><strong>Overfit checks built in.</strong> When I hand-curated synonym clusters and near-duplicate folding to close internal gaps, the external 500-question run stayed byte-identical (zero changed questions, zero folds) — proof the fixes fire only on the gap they were written for, not on the benchmark.</span><span data-lang="zh"><strong>内建过拟合检查。</strong>手工策展同义词簇和近重复折叠关闭内部缺口后，外部 500 题逐字节零变化（0 题改变、0 次折叠）——证明修复只对它们针对的缺口触发，而非面向基准调参。</span></p>
+            <div class="callout">
+                <p><span data-lang="en"><strong>An example loop (the safety one).</strong> An adversarial case — a hedged statement like &ldquo;the team probably uses React&rdquo;, confidence 0.95, quote present — slipped through the auto-confirm gate. Root cause: the gate did not detect hedging language. Fix: a hedge-pattern check. Re-measured on the expanded 8-case adversarial set: false-positive rate 16.7% &rarr; 0%, locked with a unit test. Measure &rarr; root-cause &rarr; fix &rarr; re-measure &rarr; lock.</span><span data-lang="zh"><strong>闭环示例（安全这条）。</strong>一条对抗样本——&ldquo;团队大概用 React&rdquo;式的对冲表述，置信度 0.95、引文在场——穿过了自动确认门。根因：门没有检测对冲语言。修复：加入对冲模式检查。在扩充到 8 例的对抗集上复测：误判率 16.7% &rarr; 0%，并以单测锁死。度量 &rarr; 根因 &rarr; 修复 &rarr; 复测 &rarr; 锁定。</span></p>
+            </div>
+            <p class="case-src"><span data-lang="en">Full methodology, all 16 loops, and the failure findings: <a href="https://github.com/peirongli/Note-Jarvis/blob/main/docs/EVAL.md">docs/EVAL.md</a>.</span><span data-lang="zh">完整评估方法、全部 16 个闭环与失败发现见 <a href="https://github.com/peirongli/Note-Jarvis/blob/main/docs/EVAL.md">docs/EVAL.md</a>。</span></p>
+        </section>
+
+        <section id="results">
+            <h2><span data-lang="en">Results — and what they don't prove</span><span data-lang="zh">结果——以及它们不能证明什么</span></h2>
+            <div class="table-wrap" data-lang="en">
+                <table class="case-table">
+                    <thead><tr><th>Metric</th><th>Result</th></tr></thead>
+                    <tbody>
+                        <tr><td>Internal retrieval</td><td>MRR 0.950 (lexical) / 0.956 (hybrid); Recall@4 94.2% (target &ge; 0.85 / 85%)</td></tr>
+                        <tr><td>Retrieval Precision@4</td><td>81.6% lexical (target &ge; 80% met) · 70.3% hybrid (open — see limits)</td></tr>
+                        <tr><td>Auto-confirm safety</td><td>FPR 16.7% &rarr; <strong>0%</strong>, held on the adversarial set</td></tr>
+                        <tr><td>External transfer</td><td>LongMemEval-S hit@4 <strong>0.815</strong>, pure local, $0 per run</td></tr>
+                        <tr><td>Extraction (heuristic vs LLM)</td><td>type contract 100% vs 22.2% / 16.7%; $0 vs $0.0052 / $0.0233</td></tr>
+                        <tr><td>Ship state</td><td>53 automated tests · 16 closed eval loops · MIT open source</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-wrap" data-lang="zh">
+                <table class="case-table">
+                    <thead><tr><th>指标</th><th>结果</th></tr></thead>
+                    <tbody>
+                        <tr><td>内部检索</td><td>MRR 0.950（lexical）/ 0.956（hybrid）；Recall@4 94.2%（目标 &ge; 0.85 / 85%）</td></tr>
+                        <tr><td>检索 Precision@4</td><td>81.6% lexical（达到 &ge; 80% 目标）· 70.3% hybrid（未解决——见局限）</td></tr>
+                        <tr><td>自动确认安全</td><td>FPR 16.7% &rarr; <strong>0%</strong>，对抗集复测保持</td></tr>
+                        <tr><td>外部迁移</td><td>LongMemEval-S hit@4 <strong>0.815</strong>，纯本地，每次 $0</td></tr>
+                        <tr><td>抽取（启发式 vs LLM）</td><td>类型契约 100% vs 22.2% / 16.7%；成本 $0 vs $0.0052 / $0.0233</td></tr>
+                        <tr><td>交付状态</td><td>53 个自动化测试 · 16 个评估闭环 · MIT 开源</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p><span data-lang="en">The internal numbers measure <strong>fit to the vault they were built for</strong>; the external ones measure <strong>transfer</strong>. I report both because the gap between them is the honest part:</span><span data-lang="zh">内部数字衡量的是<strong>对它所服务的语料库的契合度</strong>，外部数字衡量的是<strong>迁移能力</strong>，两个都报，因为差距本身就是诚实的一部分：</span></p>
+            <ul>
+                <li><span data-lang="en">the internal synonym map is partly hand-curated against hard eval queries — the relationships are real, the coverage isn't production-scale;</span><span data-lang="zh">内部同义词映射部分是针对评测难题手工策展的——关系是真的，覆盖面不是生产级的；</span></li>
+                <li><span data-lang="en">the LLM comparison ran against a deliberately frozen prompt — making it competitive is documented future work, not a settled verdict;</span><span data-lang="zh">LLM 对比跑在刻意冻结的 prompt 上——让它有竞争力是已记录的后续工作，不是定论；</span></li>
+                <li><span data-lang="en">hybrid precision@4 (70.3%) remains below the 80% target, with a characterized open failure mode: topically-adjacent distractors.</span><span data-lang="zh">hybrid precision@4（70.3%）仍低于 80% 目标，失败模式已定性但未解决：主题相邻的干扰项。</span></li>
+            </ul>
+        </section>
+
+        <section id="reflection">
+            <h2><span data-lang="en">What I'd do differently</span><span data-lang="zh">如果重来</span></h2>
+            <ol>
+                <li><span data-lang="en"><strong>Teach the prompt a type-assignment policy before re-judging the LLM.</strong> The frozen comparison is fair to the shipped prompt but unfair to the technique — the failures were mostly contract misalignment, which is fixable prompt work. I kept it frozen on purpose; next time, one deliberate prompt iteration happens before a heuristic-vs-LLM default is settled.</span><span data-lang="zh"><strong>重新评判 LLM 之前，先教 prompt 类型分配策略。</strong>LLM 对比对&ldquo;出厂 prompt&rdquo;是公平的，对&ldquo;这项技术&rdquo;并不公平——失败主要来自契约错位，而这是可修的 prompt 工作。我有意让它保持冻结；下次会先做一轮刻意的 prompt 迭代，再定启发式 vs LLM 的默认值。</span></li>
+                <li><span data-lang="en"><strong>Author the hard queries before the first feature decision rests on them.</strong> The v3 &rarr; v4 gold-set revision added 19 harder queries and completed the multi-relevant labels; every number dropped, because v3 had been under-counting relevance — the eval getting more honest, not the retrieval getting worse. Until the labels completed, precision@4 had silently been a lower bound. Adversarial material (near-duplicate clusters, derivational synonyms, verified nulls) is day-one work, not a later revision.</span><span data-lang="zh"><strong>在第一个功能决策依赖评测之前，先把难题写进 gold set。</strong>v3 &rarr; v4 的 gold 集修订补了 19 条更难的查询并补全了多相关标签，所有数字都掉了——因为 v3 一直在低估相关性：是评测变得更诚实，而不是检索变差了。标签补全之前，precision@4 一直被当成下限在报。对抗性素材（近重复簇、派生同义词、验证过的空查询）是第一天的功课，不是后来的修订。</span></li>
+                <li><span data-lang="en"><strong>Grow the gold set with real queries earlier.</strong> 59 hand-authored queries surface real gaps, but hand-authored queries mirror what the author already knows — they cannot give statistical confidence. Opt-in query logging should ship with the harness, not after it.</span><span data-lang="zh"><strong>更早用真实查询扩充 gold 集。</strong>59 条手写查询能暴露真实缺口，但手写查询映照的是作者已知的东西——给不了统计置信度。opt-in 查询记录应该和 harness 一起交付，而不是之后。</span></li>
+            </ol>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Peirong LI's Personal Website. All rights reserved.</p>
+    </footer>
+
+    <button class="to-top" type="button" aria-label="Back to top">&uarr;</button>
+    <script src="../assets/main.js" defer></script>
+</body>
+</html>
