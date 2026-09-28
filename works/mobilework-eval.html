@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eval System for Multi-Agent Experts · Peirong LI</title>
+    <meta name="description" content="Case study: the measurement layer for multi-agent AI expert systems — 8-case matrix, 80 formal runs with archived evidence, same-condition retests, and a benchmark that publishes its judge protocol.">
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script>
+        try {
+            if (localStorage.getItem('page-lang') === 'zh') {
+                document.documentElement.setAttribute('data-page-lang', 'zh');
+                document.documentElement.setAttribute('lang', 'zh-CN');
+            }
+        } catch (e) {}
+    </script>
+</head>
+<body>
+    <div class="progress-bar" aria-hidden="true"></div>
+
+    <header class="site-header">
+        <p class="tagline"><span data-lang="en">Portfolio · Case study</span><span data-lang="zh">作品集 · 案例</span></p>
+    </header>
+
+    <nav class="site-nav" aria-label="Sections">
+        <ul>
+            <li><a href="#problem"><span data-lang="en">Problem</span><span data-lang="zh">问题</span></a></li>
+            <li><a href="#design"><span data-lang="en">Design</span><span data-lang="zh">设计</span></a></li>
+            <li><a href="#decisions"><span data-lang="en">Decisions</span><span data-lang="zh">决策</span></a></li>
+            <li><a href="#results"><span data-lang="en">Results</span><span data-lang="zh">结果</span></a></li>
+            <li class="theme-item"><button id="theme-toggle" type="button" aria-label="Theme: auto (follow system)">&#9684;</button></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section class="case-hero">
+            <div class="case-title-row">
+                <h1>Eval System for Multi-Agent Experts</h1>
+                <div class="lang-toggle" id="lang-toggle" role="group" aria-label="Language / 语言">
+                    <button type="button" data-lang-opt="en" class="active">EN</button>
+                    <button type="button" data-lang-opt="zh">中文</button>
+                </div>
+            </div>
+            <p class="case-sub"><span data-lang="en">When an AI expert misbehaves, what is broken — the prompt, the workflow, or the model? I built the measurement layer that answers that, and proves fixes actually work.</span><span data-lang="zh">当 AI 专家系统表现异常，问题出在 Prompt、工作流还是模型？我搭建了回答这个问题的度量层，并证明修复真的有效。</span></p>
+            <div class="case-meta">
+                <span class="badge"><span data-lang="en">Industry internship · China Mobile SWARM</span><span data-lang="zh">企业实习 · 中国移动 SWARM</span></span>
+                <span class="badge"><span data-lang="en">Solo, end to end</span><span data-lang="zh">独立完成</span></span>
+                <span class="badge"><span data-lang="en">Evidence-archived</span><span data-lang="zh">证据留档</span></span>
+                <a class="badge badge-link" href="https://github.com/peirongli/mobilework-expert-eval-group-b-marketplace" title="GitHub"><span data-lang="en">GitHub repo &#8599;</span><span data-lang="zh">GitHub 仓库 &#8599;</span></a>
+            </div>
+            <ul class="stat-band">
+                <li>
+                    <span class="stat-num">80</span>
+                    <span class="stat-label"><span data-lang="en">Formal runs (retries archived separately)</span><span data-lang="zh">正式运行（重试单独归档）</span></span>
+                </li>
+                <li>
+                    <span class="stat-num">8</span>
+                    <span class="stat-label"><span data-lang="en">Eval cases across 3 task types</span><span data-lang="zh">评测 case · 三类任务</span></span>
+                </li>
+                <li>
+                    <span class="stat-num">0</span>
+                    <span class="stat-label"><span data-lang="en">Regressions in 20 retests</span><span data-lang="zh">20 次复测零退化</span></span>
+                </li>
+                <li>
+                    <span class="stat-num">&plusmn;13%</span>
+                    <span class="stat-label"><span data-lang="en">Pass-rate swing from judge protocol alone</span><span data-lang="zh">判官协议单独造成的通过率摆幅</span></span>
+                </li>
+            </ul>
+        </section>
+
+        <section id="problem">
+            <h2><span data-lang="en">The problem</span><span data-lang="zh">问题</span></h2>
+            <p><span data-lang="en">Expert systems — single agents and multi-agent expert teams, each an LLM wrapped with tools and a workflow — were being built for the platform. Ship date was close, but quality was judged by feel: is this expert good? Did the prompt fix help? Nobody could answer with data.</span><span data-lang="zh">平台正在开发&ldquo;专家系统&rdquo;：单专家与多智能体专家团，每个都是 LLM 包裹工具与工作流的 agent。上线在即，但质量验收全凭体感——这个专家好不好？改了 Prompt 有没有变好？没有人能拿数据回答。</span></p>
+            <p><span data-lang="en">Evaluating agent systems has three traps. Open-ended outputs resist automatic grading: a research digest has no single correct answer. High run-to-run variance means one run proves nothing. And &ldquo;it improved&rdquo; carries a proof burden — numbers measured under different conditions are not comparable.</span><span data-lang="zh">Agent 系统评测有三坑。开放式输出没法自动判分：调研简报没有唯一正确答案。运行方差大：同一配置重跑结果不同，单次运行说明不了什么。而&ldquo;提升了&rdquo;自带证明负担：优化前后不同条件下跑出的数字不可比。</span></p>
+            <p><span data-lang="en">So this project is not a scoring tool. It is an acceptance system: make expert quality comparable, failures attributable, and improvements provable.</span><span data-lang="zh">所以这个项目不是&ldquo;跑分工具&rdquo;，而是验收体系：让专家质量可比、失败可归因、优化效果可证明。</span></p>
+        </section>
+
+        <section id="design">
+            <h2><span data-lang="en">The evaluation design</span><span data-lang="zh">评测设计</span></h2>
+            <p><span data-lang="en"><strong>An 8-case matrix with per-shape metrics.</strong> Two subjects (single expert, expert team) &times; four cases each, spanning three task shapes: structured, hybrid, and open-ended. The primary metric follows the task shape — assertion pass rate, defect-detection F1, or rubric pass rate. Forcing one metric onto different task natures was never on the table.</span><span data-lang="zh"><strong>8 案例矩阵，指标跟着任务形态走。</strong>两个被测对象（单专家 / 专家团）各 4 个 case，覆盖结构化、混合式、开放式三类任务形态；主指标分别取断言通过率、缺陷检出 F1、rubric 通过率——不为不同性质的任务硬套同一个指标。</span></p>
+            <p><span data-lang="en"><strong>Execution with an evidence chain.</strong> Promptfoo drives execution and scoring under a frozen environment (model and toolchain versions pinned). Every run archives its main and sub sessions, tool calls, permission decisions, and token spend — any conclusion can be traced back to the raw session. Failures and retries are archived separately and never mixed into the formal statistics.</span><span data-lang="zh"><strong>带证据链的执行。</strong>Promptfoo 驱动执行与评分，环境冻结（模型与工具链版本钉死）。每次运行的主子会话、工具调用、权限决策、token 消耗全部按规范留档——任何结论都能回溯到原始会话。失败与重试单独归档，绝不混入正式统计。</span></p>
+            <p><span data-lang="en"><strong>The optimization loop.</strong> Attribute from per-case evidence, locate the defect (prompt or workflow), ship a versioned optimized copy, re-test under the identical cases, model, and environment, and accept only when guardrail metrics hold.</span><span data-lang="zh"><strong>优化闭环。</strong>从逐 case 证据归因，定位缺陷（Prompt 或工作流），生成带版本号的优化副本，在相同 case、相同模型、相同环境下复测，护栏指标无退化才验收。</span></p>
+            <figure class="case-figure">
+                <img src="../assets/images/eval-matrix.png" alt="Evaluation dashboard: 80-run matrix (8 cases × 5 repeats, pass/fail grid) and the evaluated subjects including baseline and optimized expert versions plus no-expert control arms">
+                <figcaption><span data-lang="en">The local dashboard: the 80-run matrix (rows = cases, columns = 5 repeats) and the subject registry — baseline and versioned optimized copies, plus no-expert control arms. Built by a script over the archived runs; purely local, no public endpoint.</span><span data-lang="zh">本地评测看板：80 次正式运行矩阵（行 = case，列 = 5 次重复）与被测对象清单——基线与带版本号的优化副本，以及无专家对照组。由脚本从归档运行自动生成，纯本地、无公网入口。</span></figcaption>
+            </figure>
+        </section>
+
+        <section id="decisions">
+            <h2><span data-lang="en">Key decisions, and what I ruled out</span><span data-lang="zh">关键决策，以及被否掉的方案</span></h2>
+            <ul class="decision-grid">
+                <li>
+                    <h3><span data-lang="en">1 · Mixed grading, not all-LLM-judge</span><span data-lang="zh">1 · 混合判分，而不是全 LLM 裁判</span></h3>
+                    <p><span data-lang="en">Structured tasks are graded by deterministic assertions (programmatic checks); only open-ended tasks go to an LLM judge with a verbatim rubric plus human spot-checks. Ruled out: all-LLM-as-judge — convenient, but it hands auditability over to the judge's randomness, and judge biases (longer answers, self-model preference) would contaminate every conclusion.</span><span data-lang="zh">结构化任务用确定性断言（程序化校验）判分；只有开放式任务才交给 LLM 裁判，配逐字 rubric 加人工抽查。被否方案：全 LLM-as-judge——省事，但把可复核性拱手让给裁判的随机性，判官偏差（偏好长回答、偏好自家模型输出）会污染所有结论。</span></p>
+                </li>
+                <li>
+                    <h3><span data-lang="en">2 · Same-condition retest, or the gain is not credible</span><span data-lang="zh">2 · 同条件复测，否则提升不可信</span></h3>
+                    <p><span data-lang="en">Optimized copies and baselines run 5 times each under identical cases, model version, and toolchain, with team-level guardrail metrics watched in parallel. Ruled out: comparing against live numbers after the change — environment drift and run variance manufacture fake improvements.</span><span data-lang="zh">优化副本与基线在相同 case、相同模型版本、相同工具链下各跑 5 次，同时监控专家团层面的护栏指标。被否方案：改完直接对比线上数字——环境漂移和运行方差会制造虚假提升。</span></p>
+                </li>
+                <li>
+                    <h3><span data-lang="en">3 · Report significance honestly, including the ugly parts</span><span data-lang="zh">3 · 统计显著性如实报告，包括不好看的部分</span></h3>
+                    <p><span data-lang="en">F1 0.96&rarr;0.97 and 0.97&rarr;1.00 are not significant at N=5 (bootstrap); a team pass-rate drop 60%&rarr;40% was tested (Fisher p=1.0) and reported as run variance, not regression. Ruled out: reporting only the flattering numbers — overall pass rate went 82%&rarr;80%, and any &ldquo;major improvement&rdquo; claim would be dismantled by the first interviewer who reads the table.</span><span data-lang="zh">F1 0.96&rarr;0.97 与 0.97&rarr;1.00 在 N=5 下 bootstrap 不显著；专家团通过率 60%&rarr;40% 经 Fisher 检验 p=1.0，判定为运行方差而非退化，如实披露。被否方案：只报好看的数字——整体通过率 82%&rarr;80%，任何&ldquo;大幅提升&rdquo;的说法都会被第一个看表的面试官拆穿。</span></p>
+                </li>
+            </ul>
+        </section>
+
+        <section id="protocol">
+            <h2><span data-lang="en">Beyond the brief: can the evaluator be trusted?</span><span data-lang="zh">超越任务书：评测者本身可信吗？</span></h2>
+            <p><span data-lang="en">The brief asked me to evaluate the experts. I also asked the next question: who evaluates the evaluator? That became a self-driven workstream — a three-layer uncertainty protocol and a calibratable benchmark.</span><span data-lang="zh">任务书要求我评测专家系统。我多问了一个问题：谁来评测评测者？这变成一条自选工作流——三层不确定度协议，加一个可校准的 benchmark。</span></p>
+            <div class="table-wrap" data-lang="en">
+                <table class="case-table">
+                    <thead><tr><th>Layer</th><th>Uncertainty source</th><th>Measured magnitude</th><th>Protocol rule</th></tr></thead>
+                    <tbody>
+                        <tr><td>L1 run variance</td><td>Same config, repeated runs</td><td>Wilson 95% CI at N=5 spans &plusmn;30&ndash;40pp</td><td>N&ge;5, CI mandatory in every report</td></tr>
+                        <tr><td>L2 judge variance</td><td>Judge protocol / model choice</td><td>Protocol alone swings pass 162&#8596;206 of 213 (&plusmn;13%); default G-Eval vs pinned Y/N: &kappa;=0.286 vs 0.030 (kappa paradox, p<sub>o</sub>=0.883)</td><td>Judge protocol published verbatim; anchor calibration mandatory</td></tr>
+                        <tr><td>L3 harness variance</td><td>promptfoo vs Inspect AI</td><td>TD-01: 3/3 vs 3/5 (not significant); both harnesses independently sampled the same brittle assertion (D3 evidence discipline)</td><td>Dual-harness comparison; single-harness conclusions must state their scope</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-wrap" data-lang="zh">
+                <table class="case-table">
+                    <thead><tr><th>层级</th><th>不确定度来源</th><th>实证量级</th><th>协议规定</th></tr></thead>
+                    <tbody>
+                        <tr><td>L1 运行方差</td><td>同一配置重复运行</td><td>N=5 时 Wilson 95% 置信区间宽达 &plusmn;30&ndash;40 个百分点</td><td>正式统计 N&ge;5，报告必附置信区间</td></tr>
+                        <tr><td>L2 判官方差</td><td>判官协议 / 模型选择</td><td>仅换评估协议，pass 在 162&#8596;206/213 之间摆动（&plusmn;13%）；默认 G-Eval 与钉死 Y/N：&kappa;=0.286 vs 0.030（kappa 悖论，p<sub>o</sub>=0.883）</td><td>判官协议逐字发布；强制锚点校准</td></tr>
+                        <tr><td>L3 harness 方差</td><td>promptfoo vs Inspect AI</td><td>TD-01：3/3 vs 3/5（不显著）；两框架独立采样到同一脆弱断言（D3 证据纪律）</td><td>双 harness 对照；单 harness 结论必须声明口径</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p><span data-lang="en">The headline finding: <strong>the judge protocol is a stronger strictness lever than the judge model.</strong> The practical fix is a 40-anchor calibratable benchmark — real deliverables with known verdicts under both protocols. Any judge implementation must reproduce the known verdicts on the anchors before it is allowed to score anything.</span><span data-lang="zh">最重要的发现：<strong>判官协议是比判官模型更强的严格度杠杆。</strong>落地为 40 锚点可校准 benchmark——真实交付物加双协议下的已知结论；任何判官实现上线前必须先在锚点上复现已知结论，不通过则协议未对齐，不得出分。</span></p>
+            <div class="callout">
+                <p><span data-lang="en"><strong>One rule this bought us.</strong> A benchmark publishes its measurement protocol, not just its score. A number untethered from the protocol that produced it cannot be compared, reproduced, or defended — the &plusmn;13% swing above is what happens when you try.</span><span data-lang="zh"><strong>这条工作换来的规则。</strong>benchmark 发布的是测量协议，而不只是分数。脱离产生它的协议，数字既不可比、也不可复现、更无法辩护——上面的 &plusmn;13% 摆幅就是无视这一点的下场。</span></p>
+            </div>
+        </section>
+
+        <section id="results">
+            <h2><span data-lang="en">Results — and what they don't prove</span><span data-lang="zh">结果——以及它们不能证明什么</span></h2>
+            <div class="table-wrap" data-lang="en">
+                <table class="case-table">
+                    <thead><tr><th>Dimension</th><th>Baseline &rarr; optimized</th><th>Statistical verdict</th></tr></thead>
+                    <tbody>
+                        <tr><td>Single expert, CR-01 defect-detection F1</td><td>0.96 &rarr; 0.97</td><td>Positive direction, not significant at N=5</td></tr>
+                        <tr><td>Single expert, CR-02 defect-detection F1</td><td>0.97 &rarr; 1.00</td><td>bootstrap p&asymp;0.156, not significant</td></tr>
+                        <tr><td>Expert team, TD-04 pass rate</td><td>83% &rarr; 86%</td><td>No regression</td></tr>
+                        <tr><td>Expert team, TD-01 pass rate</td><td>60% &rarr; 40%</td><td>Fisher p=1.0 — run variance, not regression</td></tr>
+                        <tr><td>Token cost</td><td>+2% to +87%</td><td>Negative result, disclosed and fed into the next optimization round</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-wrap" data-lang="zh">
+                <table class="case-table">
+                    <thead><tr><th>维度</th><th>基线 &rarr; 优化</th><th>统计结论</th></tr></thead>
+                    <tbody>
+                        <tr><td>单专家 CR-01 缺陷检出 F1</td><td>0.96 &rarr; 0.97</td><td>方向正向，N=5 不显著</td></tr>
+                        <tr><td>单专家 CR-02 缺陷检出 F1</td><td>0.97 &rarr; 1.00</td><td>bootstrap p&asymp;0.156，不显著</td></tr>
+                        <tr><td>专家团 TD-04 通过率</td><td>83% &rarr; 86%</td><td>无退化</td></tr>
+                        <tr><td>专家团 TD-01 通过率</td><td>60% &rarr; 40%</td><td>Fisher p=1.0——运行方差而非退化</td></tr>
+                        <tr><td>token 成本</td><td>+2% ~ +87%</td><td>主动披露的负结果，转化为下轮优化输入</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <figure class="case-figure">
+                <img src="../assets/images/eval-before-after.png" alt="Dashboard before/after comparison tab: global net effect across 8 cases (1 improved, 0 regressed, 25 unchanged) with per-case pass-rate deltas and duration comparison">
+                <figcaption><span data-lang="en">The before/after view: across all 8 cases, one improved, zero regressed, twenty-five assertions unchanged — with per-case duration deltas that exposed the optimized experts' token cost increase.</span><span data-lang="zh">看板的前后对比视图：8 个 case 汇总，1 项提升、0 项退化、25 项断言不变——逐 case 的耗时差同时暴露了优化版专家的 token 成本上升。</span></figcaption>
+            </figure>
+            <p><span data-lang="en">Delivery scale: 80 formal runs (89 archived including fully documented retries), 20 retests with zero regressions, three control arms (expert version, model tier, no-expert) verifying the experts' gain over a bare model, and 15 of 16 hard acceptance gates verified. Human review comments flow back through the dashboard into the next optimization round.</span><span data-lang="zh">交付规模：80 次正式运行（含全程留痕的重试共归档 89 次）、20 次复测零退化、三组对照实验（专家版本 × 模型档位 × 有无专家）验证专家相对裸模型的实际增益、16 项硬门槛核验通过 15 项。人工评审意见经看板回流，进入下一轮优化。</span></p>
+            <p><span data-lang="en">What the numbers don't prove: at N=5, most gains cannot reach statistical significance — that is the brief's sample size, and the reports state the boundary (&plusmn;30&ndash;40pp confidence intervals) instead of hiding it. This limitation is exactly what triggered the evaluator-trustworthiness work above.</span><span data-lang="zh">数字不能证明的：N=5 是任务书口径，小样本下大多数提升无法达到统计显著——报告里明确标注了结论边界（置信区间 &plusmn;30&ndash;40 个百分点），而不是把它藏起来。这个局限正是上面&ldquo;让评测者可信&rdquo;工作的直接起因。</span></p>
+        </section>
+
+        <section id="reflection">
+            <h2><span data-lang="en">What I'd do differently</span><span data-lang="zh">如果重来</span></h2>
+            <ol>
+                <li><span data-lang="en"><strong>Quantify the judge protocol before the first formal run.</strong> The &plusmn;13% protocol swing, if measured in week one, would have settled mid-project arguments with data instead of debate.</span><span data-lang="zh"><strong>第一次正式运行之前就量化判官协议。</strong>&plusmn;13% 的协议摆幅如果第一周就测出来，项目中期的很多争论可以直接用数据收束，而不是靠讨论。</span></li>
+                <li><span data-lang="en"><strong>Case discriminative power before run count.</strong> Five runs over a well-differentiated case set beats ten runs over homogeneous ones — case-separation analysis belongs in the pilot phase, not after the formal statistics.</span><span data-lang="zh"><strong>案例的区分度优先于运行次数。</strong>5 次 &times; 区分度强的 case 组合，好过 10 次 &times; 同质的 case——case 区分度分析应该在预跑阶段做，而不是正式统计之后。</span></li>
+                <li><span data-lang="en"><strong>Cost as a first-class metric from day one.</strong> The optimized experts' token cost rose up to 87%; a cost guardrail in the acceptance criteria would have surfaced that trade-off at design time, not at acceptance.</span><span data-lang="zh"><strong>成本从第一天起就是一等指标。</strong>优化版专家的 token 成本最高上升 87%；如果验收标准里一开始就有成本护栏，这个 trade-off 会在方案阶段暴露，而不是验收时才发现。</span></li>
+            </ol>
+            <p class="case-src"><span data-lang="en">Public program repo (expert packages, group plugin and marketplace): <a href="https://github.com/peirongli/mobilework-expert-eval-group-b-marketplace">github.com/peirongli/mobilework-expert-eval-group-b-marketplace</a>. The evaluation records and the benchmark package are local-first artifacts: 110 result directories archived on this machine, no public endpoint.</span><span data-lang="zh">公开的项目仓库（专家包、小组插件与 marketplace）：<a href="https://github.com/peirongli/mobilework-expert-eval-group-b-marketplace">github.com/peirongli/mobilework-expert-eval-group-b-marketplace</a>。评测记录与 benchmark 包是 local-first 工件：110 个结果目录归档在本机，无公网入口。</span></p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Peirong LI's Personal Website. All rights reserved.</p>
+    </footer>
+
+    <button class="to-top" type="button" aria-label="Back to top">&uarr;</button>
+    <script src="../assets/main.js" defer></script>
+</body>
+</html>
