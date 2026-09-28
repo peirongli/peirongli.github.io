@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Rock-Paper-Scissors — Case Study · Peirong LI</title>
+    <meta name="description" content="Case study: Smart RPS, a game-jam rock-paper-scissors against an LLM opponent that talks, lies and keeps secrets — but can't cheat, because fairness is enforced by call ordering, not prompt discipline.">
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script>
+        try {
+            if (localStorage.getItem('page-lang') === 'zh') {
+                document.documentElement.setAttribute('data-page-lang', 'zh');
+                document.documentElement.setAttribute('lang', 'zh-CN');
+            }
+        } catch (e) {}
+    </script>
+</head>
+<body>
+    <div class="progress-bar" aria-hidden="true"></div>
+
+    <header class="site-header">
+        <p class="tagline"><span data-lang="en">Case Study · Smart Rock-Paper-Scissors</span><span data-lang="zh">案例研究 · Smart Rock-Paper-Scissors</span></p>
+    </header>
+
+    <nav class="site-nav" aria-label="Main">
+        <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../portfolio.html">Portfolio</a></li>
+            <li><a href="#gamedesign"><span data-lang="en">Design</span><span data-lang="zh">设计</span></a></li>
+            <li><a href="#mechanism"><span data-lang="en">Mechanism</span><span data-lang="zh">机制</span></a></li>
+            <li><a href="#hindsight"><span data-lang="en">Hindsight</span><span data-lang="zh">复盘</span></a></li>
+            <li class="theme-item"><button id="theme-toggle" type="button" aria-label="Theme: auto (follow system)">&#9684;</button></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section class="case-hero">
+            <div class="case-title-row">
+                <h1>Smart Rock-Paper-Scissors</h1>
+                <div class="lang-toggle" id="lang-toggle" role="group" aria-label="Language / 语言">
+                    <button type="button" data-lang-opt="en" class="active">EN</button>
+                    <button type="button" data-lang-opt="zh">中文</button>
+                </div>
+            </div>
+            <p class="case-sub"><span data-lang="en">A game-jam RPS where the AI talks trash, keeps secrets — and can&rsquo;t cheat, by design.</span><span data-lang="zh">一场 game jam 出品的石头剪刀布：AI 会嘴炮、会保密——但它在结构上就作不了弊。</span></p>
+            <div class="case-meta">
+                <span class="badge"><span data-lang="en">Agentland Game Jam</span><span data-lang="zh">Agentland Game Jam 作品</span></span>
+                <span class="badge"><span data-lang="en">AI game design</span><span data-lang="zh">AI 游戏设计</span></span>
+                <span class="badge"><span data-lang="en">MIT open source</span><span data-lang="zh">MIT 开源</span></span>
+                <a class="badge badge-link" href="https://github.com/peirongli/Smart-RPS" title="GitHub"><span data-lang="en">GitHub repo &#8599;</span><span data-lang="zh">GitHub 仓库 &#8599;</span></a>
+                <a class="badge badge-link" href="https://space.agentlandlab.com/games/smart_rps" title="Agentland"><span data-lang="en">Play the jam build &#8599;</span><span data-lang="zh">在线玩 jam 原版 &#8599;</span></a>
+            </div>
+            <p><span data-lang="en">Smart RPS is a conversational twist on rock-paper-scissors. Each round you first declare what you&rsquo;ll throw — you may lie, or keep it secret — the AI answers with its own declaration (it lies too), then both throw for real, and only the actual throws count. The opponent is an LLM talking to a live API with zero scripted dialogue: it reacts to your declaration, adapts to your patterns, and taunts you with memes when it wins.</span><span data-lang="zh">Smart RPS 是对石头剪刀布的一次对话式改造：每轮你先宣告要出什么——可以撒谎、也可以保密——AI 回应你并给出它自己的宣告（它也会骗你），随后双方亮出真实出拳，输赢只看实际。对手是一个直连 API 的 LLM，没有一句写死的台词：它回应你的宣告、适应你的规律，赢了还会发表情包嘲讽你。</span></p>
+            <ul class="stat-band">
+                <li>
+                    <span class="stat-num">1</span>
+                    <span class="stat-label"><span data-lang="en">Model call per round — the AI&rsquo;s entire decision</span><span data-lang="zh">每轮模型调用数——即 AI 的全部决策</span></span>
+                </li>
+                <li>
+                    <span class="stat-num">0</span>
+                    <span class="stat-label"><span data-lang="en">Ways for the AI to peek at your throw</span><span data-lang="zh">AI 偷看你出拳的路径数（结构上）</span></span>
+                </li>
+                <li>
+                    <span class="stat-num">60</span>
+                    <span class="stat-label"><span data-lang="en">Real-API verification rounds, all assertions green</span><span data-lang="zh">真实 API 验证轮数，断言全绿</span></span>
+                </li>
+                <li>
+                    <span class="stat-num">$0</span>
+                    <span class="stat-label"><span data-lang="en">Backend cost — static page, no server at all</span><span data-lang="zh">后端成本——纯静态页，根本没有服务器</span></span>
+                </li>
+            </ul>
+        </section>
+
+        <section id="gamedesign">
+            <h2><span data-lang="en">The design: one cheap mind-game per round</span><span data-lang="zh">玩法设计：每轮一场廉价的心理博弈</span></h2>
+            <pre class="diagram" aria-label="Round flow diagram">declare (cheap talk)      respond &amp; lock (1 model call)      actual throw       reveal
+     you ────────────────►  AI ─────────────────────────────►  you ────────────►  result
+     may lie / secret            may lie / secret                 real only         real throws only</pre>
+            <ul>
+                <li><span data-lang="en"><strong>Why RPS as the substrate:</strong> everyone already knows the rules, a round takes three seconds, and there is nothing to build except the twist — so the entire design budget goes into the mind-game instead of a tutorial. For a game jam, that arithmetic is the pitch.</span><span data-lang="zh"><strong>为什么选石头剪刀布当基底：</strong>规则人人会、一轮三秒、除了那个&ldquo;变化&rdquo;本身没有任何要造的东西——于是全部设计预算都能花在心理博弈上，而不是新手教学。对一场 game jam 来说，这道算术题就是立项理由。</span></li>
+                <li><span data-lang="en"><strong>The twist:</strong> declarations are cheap talk; only actual throws score. That single rule turns every declaration into a bluffing decision — and hands the AI a real signal to read: each round, your declaration-versus-actual gap leaks a little of your honesty pattern. The &ldquo;secret&rdquo; option exists so the player can refuse to leak it, at the cost of giving up information too.</span><span data-lang="zh"><strong>变化所在：</strong>宣告只是空话，胜负只按实际出拳算。这一条规则让每次宣告都变成一次欺诈决策，也给 AI 留下真实可读的信号——每一轮，你的&ldquo;宣告-实际&rdquo;偏差都在泄漏一点你的诚信模式。&ldquo;保密&rdquo;选项则让玩家可以拒绝泄漏，代价是同样放弃读取对方的信息。</span></li>
+                <li><span data-lang="en"><strong>Symmetric rules make the AI a character:</strong> it also has to declare, lie, or keep secrets; its honesty is observable across rounds; it celebrates wins with meme pop-ups. You are not playing a random number generator — you are playing <em>someone</em>, and modeling that someone is the game.</span><span data-lang="zh"><strong>规则对称让 AI 成为一个&ldquo;角色&rdquo;：</strong>它同样要宣告、撒谎或保密；它的诚信度跨轮可观察；赢了还会用表情包庆祝。你面对的不是一个随机数生成器，而是<em>一个&ldquo;人&rdquo;</em>——给这个&ldquo;人&rdquo;建模，就是游戏本身。</span></li>
+                <li><span data-lang="en"><strong>Language is the game surface:</strong> with an LLM opponent, the chat is not UI copy — reacting to your declaration, adjusting tone, taunting on victory <em>is</em> the gameplay. That is the core AI-game thesis here: the model&rsquo;s language ability becomes the mechanic, and it costs zero assets.</span><span data-lang="zh"><strong>语言即玩法界面：</strong>LLM 对手的对话不是 UI 文案——回应你的宣告、调整语气、赢了嘲讽你，这些<em>本身就是玩法</em>。这是本作最核心的 AI 游戏命题：模型的语言能力直接变成游戏机制，而且零美术资产。</span></li>
+            </ul>
+            <figure class="case-figure">
+                <img src="../assets/images/smart-rps-game.png" alt="Smart RPS in play: scoreboard, chat with the AI's declarations, a revealed round and the full history panel">
+                <figcaption><span data-lang="en">A real game against DeepSeek: the chat carries the declarations, the panel below keeps both sides honest — declaration and actual, round by round.</span><span data-lang="zh">对 DeepSeek 的一局真实对局：对话区承载宣告博弈，下方面板逐轮记录双方的宣告与实际——谁在骗谁，一目了然。</span></figcaption>
+            </figure>
+        </section>
+
+        <section id="mechanism">
+            <h2><span data-lang="en">An AI opponent you can trust</span><span data-lang="zh">一个值得信任的 AI 对手</span></h2>
+            <p><span data-lang="en">In a psychological game, the moment you suspect the AI is peeking, the game is dead. So fairness is enforced by architecture — three moves, all verifiable by reading the code:</span><span data-lang="zh">心理博弈游戏里，只要你开始怀疑 AI 在偷看，游戏就死了。所以公平性由架构保证——三个动作，全部可以靠读代码验证：</span></p>
+            <ul class="decision-grid">
+                <li>
+                    <h3><span data-lang="en">1 · Commit before reveal — anti-cheat by call ordering</span><span data-lang="zh">1 · 先承诺后揭晓——靠调用时序防作弊</span></h3>
+                    <p><span data-lang="en">The AI&rsquo;s actual throw is locked inside the one model call that answers your declaration — <strong>before</strong> you choose your real throw. It cannot react to your move even in principle: no code path could. The guarantee lives in the ordering, not in a prompt asking the model to behave. A suspicious player can verify it by reading one comment at the top of <code>game.js</code>.</span><span data-lang="zh">AI 的实际出拳在&ldquo;回应你宣告&rdquo;的那一次模型调用里就已锁定——<strong>早于</strong>你选真实出拳。它在原理上就无法针对你的动作反应：不存在能做到这一点的代码路径。保证写在调用顺序里，而不是写在求模型自觉的 prompt 里。起疑的玩家读 <code>game.js</code> 顶部一段注释即可自行验证。</span></p>
+                </li>
+                <li>
+                    <h3><span data-lang="en">2 · Fail loudly, never fake a move</span><span data-lang="zh">2 · 宁可报错，绝不替 AI 出拳</span></h3>
+                    <p><span data-lang="en">The jam-era version had a silent fallback: if the model&rsquo;s reply couldn&rsquo;t be parsed, the game picked a random move for the AI and play continued. I removed it. A parse failure now retries once, then errors visibly and voids the round. A silent random move would poison every later win with doubt — &ldquo;did I beat the AI, or did I beat the dice?&rdquo;</span><span data-lang="zh">jam 版有一个静默兜底：模型回应解析失败时，游戏替 AI 随机出一拳继续玩。重构时我删掉了它。现在解析失败会重试一次，然后显式报错、本轮作废。静默的随机出拳会让此后每一次胜利都被怀疑腐蚀——&ldquo;我赢的是 AI，还是骰子？&rdquo;</span></p>
+                </li>
+                <li>
+                    <h3><span data-lang="en">3 · No backend, bring your own key</span><span data-lang="zh">3 · 无后端，自带 key</span></h3>
+                    <p><span data-lang="en">The whole game is a zero-build static page. Requests go straight from your browser to the provider you choose; the key lives in localStorage; there is nothing to leak because there is no server. A bundled mock server lets you play the full loop without spending a single token — which is also how the automated tests run.</span><span data-lang="zh">整个游戏是零构建的纯静态页。请求由浏览器直连你选择的服务商，key 只存在 localStorage，没有服务器就什么都不会泄漏。附带 mock 服务器，不花一个 token 也能玩通全流程——自动化测试跑的也是这条路。</span></p>
+                </li>
+            </ul>
+            <figure class="case-figure">
+                <img src="../assets/images/smart-rps-start.png" alt="Start screen with provider presets, API key field and the privacy note about browser-only storage">
+                <figcaption><span data-lang="en">The start screen: pick a provider, paste your key, play. The privacy promise is structural — there is no server to send it to.</span><span data-lang="zh">开始界面：选服务商、贴 key、开玩。隐私承诺是结构性的——根本不存在可以把 key 发过去的服务器。</span></figcaption>
+            </figure>
+        </section>
+
+        <section id="hindsight">
+            <h2><span data-lang="en">What shipped, and what I&rsquo;d do differently</span><span data-lang="zh">交付了什么，以及如果重来</span></h2>
+            <p><span data-lang="en"><strong>What shipped:</strong> the original jam build is still playable online; the refactored open-source version splits the 855-line god class into three modules (AI / game / UI), adds persistence, and ships with a mock server plus 60 real-API verification rounds covering scoring, anti-spoiler display, refresh recovery and the easter egg.</span><span data-lang="zh"><strong>交付状态：</strong>jam 原版仍在线可玩；重构后的开源版把 855 行的上帝类拆成三个模块（AI / 游戏 / UI），补了持久化，附带 mock 服务器，并用 60 轮真实 API 验证覆盖判分、防剧透展示、刷新恢复与彩蛋。</span></p>
+            <ol>
+                <li><span data-lang="en"><strong>Ship the player modeling explicitly.</strong> Today the AI receives raw recent history and mines patterns by itself; &ldquo;reads your bluffing patterns&rdquo; deserves a real mechanic — structured stats (declaration-actual deviation rate, throw frequency) fed into the prompt, so the adaptation is visible, tunable and honest, instead of emergent and fragile.</span><span data-lang="zh"><strong>把玩家建模做成显式机制。</strong>现在 AI 拿到的是原始历史、靠自己挖掘规律；&ldquo;会读你的虚晃规律&rdquo;这个承诺配得上一个真实机制——把结构化统计（宣告-实际偏差率、出拳频率）直接喂进 prompt，让&ldquo;适应&rdquo;可见、可调、可预期，而不是涌现的、碰运气的。</span></li>
+                <li><span data-lang="en"><strong>Measure the fun, not just the loop.</strong> 60 automated API rounds prove the mechanics work; nothing yet proves the game is engaging. The next iteration belongs to playtests: watch real people bluff, count rounds per session, and iterate the declaration design on retention rather than on my own taste.</span><span data-lang="zh"><strong>度量&ldquo;好玩&rdquo;，而不只是&ldquo;能玩&rdquo;。</strong>60 轮自动化 API 验证只证明机制正确，还没有任何证据证明游戏有趣。下一轮迭代应该交给 playtest：看真人怎么撒谎、数每人平均玩几轮、用留存数据迭代宣告设计，而不是靠我自己的口味。</span></li>
+                <li><span data-lang="en"><strong>Give declarations more texture.</strong> A declaration is currently one of four buttons. Tiered trash talk, directed claims (&ldquo;you always lie after a loss&rdquo;), reactions to streaks — the cheapest content in an LLM game is more language, and the psychological layer is where it should be spent.</span><span data-lang="zh"><strong>让宣告更有层次。</strong>现在宣告只是四个按钮之一。分级的嘴炮、有指向性的断言（&ldquo;你输了之后必撒谎&rdquo;）、对连胜连败的反应——LLM 游戏里最便宜的内容就是更多的语言，而心理博弈层正是最该花它的地方。</span></li>
+            </ol>
+            <p class="case-src"><span data-lang="en"><a href="https://space.agentlandlab.com/games/smart_rps">Play the jam build</a> · <a href="https://github.com/peirongli/Smart-RPS">Read the source</a></span><span data-lang="zh"><a href="https://space.agentlandlab.com/games/smart_rps">在线玩 jam 原版</a> · <a href="https://github.com/peirongli/Smart-RPS">在 GitHub 读源码</a></span></p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Peirong LI's Personal Website. All rights reserved.</p>
+    </footer>
+
+    <button class="to-top" type="button" aria-label="Back to top">&uarr;</button>
+    <script src="../assets/main.js" defer></script>
+</body>
+</html>

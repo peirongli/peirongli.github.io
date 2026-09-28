@@ -127,6 +127,9 @@ section {
 #news        { --sec: var(--amber); --sec-rgb: var(--amber-rgb); }
 #researches  { --sec: var(--blue);  --sec-rgb: var(--blue-rgb); }
 #projects    { --sec: var(--coral); --sec-rgb: var(--coral-rgb); }
+#gamedesign  { --sec: var(--coral); --sec-rgb: var(--coral-rgb); }
+#mechanism   { --sec: var(--teal);  --sec-rgb: var(--teal-rgb); }
+#hindsight   { --sec: var(--amber); --sec-rgb: var(--amber-rgb); }
 
 main section a {
   color: var(--sec);
